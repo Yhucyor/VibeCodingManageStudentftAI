@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Student Assistant - AI Space</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="assistant.css" />
+</head>
+<body>
+  <!-- Background Glows -->
+  <div class="glow-bg">
+    <div class="glow-sphere sphere-1"></div>
+    <div class="glow-sphere sphere-2"></div>
+  </div>
+
+  <div class="adv-section">
+    <div class="adv-container">
+      <div class="adv-card-wrapper">
+        <!-- Glowing Conic Border effect -->
+        <div class="adv-animated-border">
+          <div class="adv-conic-gradient"></div>
+        </div>
+
+        <div class="adv-card-inner" style="height: 600px;">
+          <!-- Embedded Realtime Live2D/3D ZeroWeight React App -->
+          <iframe 
+            src="http://localhost:3000/" 
+            allow="microphone; camera; display-capture" 
+            style="width: 100%; height: 100%; border: none; border-radius: 34px; display: block; background: transparent;"
+            title="Zera AI Assistant"
+          ></iframe>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Close Page and Back to Dashboard -->
+  <button class="close-assistant-btn" onclick="location.href='home.html'" title="Quay lại Dashboard">
+    <svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+  </button>
+</body>
+</html>
