@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tim kiem da nguon cao tu dong</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="search.css" />
+</head>
+<body>
+  <div class="glow-bg">
+    <div class="glow-sphere sphere-1"></div>
+    <div class="glow-sphere sphere-2"></div>
+  </div>
+
+  <div class="search-container">
+    <header class="search-header">
+      <button class="back-btn" onclick="location.href='home.html'">
+        <svg viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+        <span>Quay lai Dashboard</span>
+      </button>
+
+      <div class="header-main">
+        <div class="title-area">
+          <h1>TIM KIEM DA NGUON CAO TU DONG</h1>
+          <p>Thu thap tai lieu hoc tap tu Drive, GitHub, SlideShare, Tailieu.vn, Scribd, HCMUTE Library, Google Scholar, OpenCourseWare va YouTube Edu.</p>
+        </div>
+      </div>
+    </header>
+
+    <section class="scraper-dashboard">
+      <div class="search-control-panel">
+        <div class="search-bar-row">
+          <input type="text" id="searchQueryInput" placeholder="Nhap tu khoa tai lieu muon cao (Vi du: Cau truc du lieu, Lap trinh Web...)" autocomplete="off" />
+          <button class="start-crawl-btn" id="startCrawlBtn">
+            <svg viewBox="0 0 24 24" class="spider-icon"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17h-2v-2h2v2zm2.07-7.75-.9.92C13.45 12.9 13 13.5 13 15h-2v-.5c0-1.1.45-2.1 1.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.41 0-1.1-.9-2-2-2s-2 .9-2 2H7c0-2.76 2.24-5 5-5s5 2.24 5 5c0 1.04-.42 1.99-1.07 2.75z"/></svg>
+            <span>Bat dau cao du lieu</span>
+          </button>
+        </div>
+
+        <div class="source-checkboxes">
+          <span class="source-lbl">Nguon quet:</span>
+          <label class="cb-container"><input type="checkbox" id="srcGDrive" checked /><span class="checkmark"></span>Google Drive Shared</label>
+          <label class="cb-container"><input type="checkbox" id="srcGithub" checked /><span class="checkmark"></span>GitHub Education</label>
+          <label class="cb-container"><input type="checkbox" id="srcSlideShare" checked /><span class="checkmark"></span>SlideShare</label>
+          <label class="cb-container"><input type="checkbox" id="srcTailieu" checked /><span class="checkmark"></span>Tailieu.vn</label>
+          <label class="cb-container"><input type="checkbox" id="srcScribd" checked /><span class="checkmark"></span>Scribd</label>
+          <label class="cb-container"><input type="checkbox" id="srcHcmute" checked /><span class="checkmark"></span>HCMUTE Library</label>
+          <label class="cb-container"><input type="checkbox" id="srcScholar" checked /><span class="checkmark"></span>Google Scholar</label>
+          <label class="cb-container"><input type="checkbox" id="srcOpenCourse" checked /><span class="checkmark"></span>OpenCourseWare</label>
+          <label class="cb-container"><input type="checkbox" id="srcYoutubeEdu" /><span class="checkmark"></span>YouTube Edu</label>
+        </div>
+
+        <div class="custom-source-panel">
+          <div class="custom-source-header">
+            <span>Nguon tuy chinh cua ban</span>
+            <button class="mini-action-btn" type="button" id="clearCustomSourcesBtn">Xoa nguon tuy chinh</button>
+          </div>
+          <form class="custom-source-form" id="customSourceForm">
+            <input type="text" id="customSourceName" placeholder="Ten nguon (VD: HCMUTE Forum)" required />
+            <input type="url" id="customSourceUrl" placeholder="URL hoac mau tim kiem, co the dung {query}" required />
+            <select id="customSourceType" required>
+              <option value="library">Thu vien / tai lieu</option>
+              <option value="forum">Dien dan</option>
+              <option value="paper">Hoc thuat</option>
+              <option value="video">Video</option>
+              <option value="other">Khac</option>
+            </select>
+            <button class="mini-action-btn add" type="submit">Them nguon</button>
+          </form>
+          <div class="custom-source-list" id="customSourceList"></div>
+        </div>
+      </div>
+
+      <div class="console-card" id="consoleCard" style="display: none;">
+        <div class="console-header">
+          <div class="console-dots">
+            <span class="dot red"></span>
+            <span class="dot yellow"></span>
+            <span class="dot green"></span>
+          </div>
+          <span class="console-title">ZERA CRAWLER SERVICE ENGINE v1.5.0</span>
+          <span class="console-status" id="consoleStatus">IDLE</span>
+        </div>
+        <div class="console-body" id="consoleBody"></div>
+      </div>
+    </section>
+
+    <main class="results-area">
+      <div class="results-header-row" id="resultsHeaderRow" style="display: none;">
+        <h2>KET QUA DONG BO CAO DUOC (<span id="resultsCount">0</span>)</h2>
+        <div class="relevance-info">Sap xep theo do tuong thich thuc te</div>
+      </div>
+      <div class="results-list" id="resultsContainer"></div>
+    </main>
+  </div>
+
+  <div class="toast-notification" id="toast">Da luu tai lieu vao thu vien so!</div>
+
+  <script>
+    const searchQueryInput = document.getElementById('searchQueryInput');
+    const startCrawlBtn = document.getElementById('startCrawlBtn');
+    const consoleCard = document.getElementById('consoleCard');
+    const consoleBody = document.getElementById('consoleBody');
+    const consoleStatus = document.getElementById('consoleStatus');
+    const resultsHeaderRow = document.getElementById('resultsHeaderRow');
+    const resultsContainer = document.getElementById('resultsContainer');
+    const resultsCount = document.getElementById('resultsCount');
+    const toast = document.getElementById('toast');
+    const customSourceForm = document.getElementById('customSourceForm');
+    const customSourceList = document.getElementById('customSourceList');
+    const clearCustomSourcesBtn = document.getElementById('clearCustomSourcesBtn');
+
+    const sourcesCheckboxes = {
+      gdrive: document.getElementById('srcGDrive'),
+      github: document.getElementById('srcGithub'),
+      slideshare: document.getElementById('srcSlideShare'),
+      tailieu: document.getElementById('srcTailieu'),
+      scribd: document.getElementById('srcScribd'),
+      hcmute: document.getElementById('srcHcmute'),
+      scholar: document.getElementById('srcScholar'),
+      opencourse: document.getElementById('srcOpenCourse'),
+      youtubeedu: document.getElementById('srcYoutubeEdu')
+    };
+
+    const defaultSourcesMap = {
+      gdrive: { name: "Google Drive Shared", brand: "gdrive", logo: "Drive", log: "Quet folder cong khai va file chia se." },
+      github: { name: "GitHub Education", brand: "github", logo: "Git", log: "Truy van repository, README va file bai tap." },
+      slideshare: { name: "SlideShare Index", brand: "slideshare", logo: "PPT", log: "Cao chi muc slide bai giang." },
+      tailieu: { name: "Tailieu.vn Free", brand: "tailieu", logo: "TL", log: "Trich xuat giao trinh, de thi va tai lieu tham khao." },
+      scribd: { name: "Scribd Premium", brand: "scribd", logo: "SC", log: "Doi sanh tai lieu tham khao chuyen sau." },
+      hcmute: { name: "HCMUTE Library", brand: "hcmute", logo: "UTE", log: "Quet thu vien truong, de cuong va tai lieu mon hoc." },
+      scholar: { name: "Google Scholar", brand: "scholar", logo: "GS", log: "Doi sanh bai bao, citation va PDF hoc thuat mo." },
+      opencourse: { name: "OpenCourseWare", brand: "opencourse", logo: "OCW", log: "Thu thap lecture note, lab va assignment tu kho mo." },
+      youtubeedu: { name: "YouTube Edu", brand: "youtubeedu", logo: "YT", log: "Quet transcript video bai giang va playlist hoc tap." }
+    };
+
+    const sourceTemplates = {
+      gdrive: ["Bo tai lieu chia se mon", "Folder tong hop bai tap va dap an"],
+      github: ["Repository hoc phan", "Source code demo va markdown on tap"],
+      slideshare: ["Slide bai giang chi tiet hoc phan", "Deck thuyet trinh tom tat chuong"],
+      tailieu: ["Giao trinh va bai tap mon", "De thi tham khao co loi giai"],
+      scribd: ["Tai lieu tham khao chuyen sau", "Ban tong hop ly thuyet"],
+      hcmute: ["Tai nguyen thu vien HCMUTE cho mon", "De cuong va tai lieu lop HCMUTE"],
+      scholar: ["Bai bao va citation lien quan", "PDF hoc thuat mo ve"],
+      opencourse: ["Lecture note OpenCourseWare ve", "Assignment va lab mau cho"],
+      youtubeedu: ["Playlist bai giang video", "Transcript video giai thich"]
+    };
+
+    let activeScrapedItems = [];
+    let customSources = loadCustomSources();
+
+    function loadCustomSources() {
+      try {
+        return JSON.parse(localStorage.getItem('customCrawlerSources')) || [];
+      } catch {
+        return [];
+      }
+    }
+
+    function saveCustomSources() {
+      localStorage.setItem('customCrawlerSources', JSON.stringify(customSources));
+    }
+
+    function getSourcesMap() {
+      const customMap = {};
+      customSources.forEach(source => {
+        customMap[source.key] = {
+          name: source.name,
+          brand: source.brand,
+          logo: source.logo,
+          log: `Quet nguon tuy chinh ${source.name} tai ${source.url}.`,
+          url: source.url,
+          custom: true,
+          type: source.type
+        };
+      });
+      return { ...defaultSourcesMap, ...customMap };
+    }
+
+    function getSelectedSources() {
+      const selectedDefaults = Object.keys(sourcesCheckboxes).filter(key => sourcesCheckboxes[key].checked);
+      const selectedCustom = customSources
+        .filter(source => document.getElementById(`src_${source.key}`)?.checked)
+        .map(source => source.key);
+      return [...selectedDefaults, ...selectedCustom];
+    }
+
+    function renderCustomSources() {
+      customSourceList.innerHTML = customSources.length ? customSources.map(source => `
+        <label class="cb-container custom-source-chip">
+          <input type="checkbox" id="src_${source.key}" checked />
+          <span class="checkmark"></span>
+          <span>${escapeHtml(source.name)}</span>
+          <button class="remove-source-btn" type="button" data-remove-source="${source.key}" title="Xoa nguon">x</button>
+        </label>
+      `).join('') : '<span class="empty-custom-source">Chua co nguon tuy chinh.</span>';
+    }
+
+    function makeCustomSourceKey(name) {
+      return `custom_${Date.now()}_${name.toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_|_$/g, '')}`;
+    }
+
+    function logoFromType(type) {
+      return {
+        library: "LIB",
+        forum: "FOR",
+        paper: "DOC",
+        video: "VID",
+        other: "SRC"
+      }[type] || "SRC";
+    }
+
+    function writeLog(text, type = 'info') {
+      const p = document.createElement('p');
+      p.className = `log-line log-${type}`;
+      p.innerHTML = `<span class="log-timestamp">[${new Date().toLocaleTimeString()}]</span> ${text}`;
+      consoleBody.appendChild(p);
+      consoleBody.scrollTop = consoleBody.scrollHeight;
+    }
+
+    startCrawlBtn.addEventListener('click', () => {
+      const query = searchQueryInput.value.trim();
+      if (!query) {
+        alert("Vui long nhap tu khoa tim kiem tai lieu truoc!");
+        return;
+      }
+
+      const selectedSources = getSelectedSources();
+      if (selectedSources.length === 0) {
+        alert("Vui long chon it nhat mot nguon tai lieu de quet!");
+        return;
+      }
+
+      startCrawlBtn.disabled = true;
+      consoleCard.style.display = "block";
+      consoleBody.innerHTML = "";
+      consoleStatus.textContent = "RUNNING";
+      consoleStatus.className = "console-status running";
+      resultsHeaderRow.style.display = "none";
+      resultsContainer.innerHTML = "";
+
+      writeLog(`Bat dau tien trinh ra quet tai lieu voi tu khoa: "${query}"`, "info");
+      writeLog(`Da chon ${selectedSources.length} nguon cao du lieu.`, "info");
+
+      const steps = [
+        { delay: 500, action: () => writeLog("Khoi tao Zera Scraper Agent va hang doi nguon...", "info") },
+        ...selectedSources.map((sourceKey, index) => ({
+          delay: 1200 + index * 550,
+          action: () => {
+            const source = getSourcesMap()[sourceKey];
+            writeLog(`[${source.name}] ${source.log}`, index % 3 === 2 ? "success" : "info");
+          }
+        })),
+        {
+          delay: 1200 + selectedSources.length * 550,
+          action: () => writeLog("Tong hop ket qua, loai trung lap va xep hang tuong thich...", "info")
+        },
+        {
+          delay: 1800 + selectedSources.length * 550,
+          action: () => {
+            activeScrapedItems = generateScrapedItems(query, selectedSources);
+            writeLog(`Tien trinh cao hoan tat! Thu duoc ${activeScrapedItems.length} tai lieu phu hop nhat.`, "success");
+            consoleStatus.textContent = "COMPLETED";
+            consoleStatus.className = "console-status completed";
+            startCrawlBtn.disabled = false;
+            renderResults();
+          }
+        }
+      ];
+
+      steps.forEach(step => setTimeout(step.action, step.delay));
+    });
+
+    function generateScrapedItems(query, selectedSources) {
+      const formats = ["PDF", "PPTX", "ZIP", "DOCX", "HTML", "VIDEO"];
+      const sourcesMap = getSourcesMap();
+      const results = [];
+
+      selectedSources.forEach((sourceKey, index) => {
+        const source = sourcesMap[sourceKey];
+        const templates = sourceTemplates[sourceKey] || [`Ket qua cao tu ${source.name} cho`, `Tai lieu lien quan tu ${source.name} ve`];
+
+        for (let itemIndex = 1; itemIndex <= 2; itemIndex++) {
+          const format = formats[(index + itemIndex + Math.floor(Math.random() * formats.length)) % formats.length];
+          const size = format === "VIDEO" ? `${Math.floor(Math.random() * 35 + 8)} phut` : `${(Math.random() * 12 + 1.2).toFixed(1)} MB`;
+          const relevance = `${Math.floor(Math.random() * 15 + 85)}%`;
+          const title = `${templates[itemIndex - 1]} ${query}${itemIndex === 2 ? ` - Chuong ${Math.floor(Math.random() * 6 + 1)}` : ""}`;
+
+          results.push({
+            id: `scraped_${sourceKey}_${index}_${itemIndex}_${Date.now()}`,
+            title,
+            sourceName: source.name,
+            sourceBrand: source.brand,
+            sourceLogo: source.logo,
+            format,
+            size,
+            relevance,
+            instructor: sourceKey === "hcmute" ? "HCMUTE Digital Library" : "Cong dong chia se hoc thuat",
+            url: source.url ? source.url.replace('{query}', encodeURIComponent(query)) : '#',
+            year: "2026",
+            summary: `He thong cao tu dong da phan tich tai lieu tu ${source.name} khop voi tu khoa "${query}" o muc tuong thich cao.`
+          });
+        }
+      });
+
+      return results.sort((a, b) => parseInt(b.relevance) - parseInt(a.relevance));
+    }
+
+    function renderResults() {
+      resultsCount.textContent = activeScrapedItems.length;
+      resultsHeaderRow.style.display = "flex";
+      resultsContainer.innerHTML = "";
+
+      activeScrapedItems.forEach(item => {
+        const card = document.createElement('div');
+        card.className = "scraped-card";
+        card.innerHTML = `
+          <div class="scraped-card-left">
+            <div class="source-info">
+              <span class="source-tag brand-${item.sourceBrand}">${item.sourceLogo} ${item.sourceName}</span>
+              <span class="relevance-badge">${item.relevance} Match</span>
+            </div>
+            <h3 class="scraped-title">${escapeHtml(item.title)}</h3>
+            <p class="scraped-summary">${escapeHtml(item.summary)}</p>
+            <div class="scraped-meta">
+              <span>Dinh dang: <strong>${item.format}</strong></span>
+              <span>Dung luong: <strong>${item.size}</strong></span>
+              <span>Nguon: <strong class="link-simulation">Tai truc tiep</strong></span>
+            </div>
+          </div>
+          <div class="scraped-card-right">
+            <button class="save-lib-btn" onclick="saveToLibrary('${item.id}', this)">
+              <svg viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+              <span>Luu ve Thu vien</span>
+            </button>
+            <a class="external-view-btn" href="${escapeHtml(item.url || '#')}" onclick="alert('Dang mo lien ket cao truc tiep tu nguon ${item.sourceName}...'); return false;">Xem nguon cao</a>
+          </div>
+        `;
+        resultsContainer.appendChild(card);
+      });
+    }
+
+    window.saveToLibrary = function(id, buttonElement) {
+      const item = activeScrapedItems.find(result => result.id === id);
+      if (!item) return;
+
+      let customDocs = [];
+      try {
+        customDocs = JSON.parse(localStorage.getItem('customDocuments')) || [];
+      } catch {
+        customDocs = [];
+      }
+
+      if (customDocs.some(doc => doc.title === item.title)) {
+        showToast("Tai lieu nay da ton tai trong Thu vien so!");
+        return;
+      }
+
+      const newDoc = {
+        id: "custom_" + Date.now(),
+        title: item.title,
+        type: item.format.toLowerCase() === "pptx" ? "slide" : (item.format.toLowerCase() === "zip" ? "exam" : "book"),
+        typeText: item.format.toLowerCase() === "zip" ? "De Thi Cu" : (item.format.toLowerCase() === "pptx" ? "Slide Bai Giang" : "Giao Trinh"),
+        subject: "web",
+        subjectName: "Tai lieu cao",
+        instructor: item.instructor,
+        size: item.size,
+        format: item.format,
+        year: item.year,
+        downloads: 0,
+        summary: item.summary
+      };
+
+      customDocs.push(newDoc);
+      localStorage.setItem('customDocuments', JSON.stringify(customDocs));
+
+      buttonElement.classList.add('saved');
+      buttonElement.disabled = true;
+      buttonElement.innerHTML = `
+        <svg viewBox="0 0 24 24"><path d="M9 16.17 4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+        <span>Da luu vao thu vien</span>
+      `;
+
+      showToast("Da luu tai lieu thanh cong vao Thu vien so!");
+    };
+
+    function showToast(text) {
+      toast.textContent = text;
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 3000);
+    }
+
+    function escapeHtml(value) {
+      return String(value).replace(/[&<>"']/g, char => ({
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#039;'
+      }[char]));
+    }
+
+    customSourceForm.addEventListener('submit', (event) => {
+      event.preventDefault();
+      const name = document.getElementById('customSourceName').value.trim();
+      const url = document.getElementById('customSourceUrl').value.trim();
+      const type = document.getElementById('customSourceType').value;
+      if (!name || !url) return;
+
+      customSources.push({
+        key: makeCustomSourceKey(name),
+        name,
+        url,
+        type,
+        brand: 'custom',
+        logo: logoFromType(type)
+      });
+      saveCustomSources();
+      renderCustomSources();
+      customSourceForm.reset();
+      showToast("Da them nguon cao tuy chinh.");
+    });
+
+    customSourceList.addEventListener('click', (event) => {
+      const removeButton = event.target.closest('[data-remove-source]');
+      if (!removeButton) return;
+      customSources = customSources.filter(source => source.key !== removeButton.dataset.removeSource);
+      saveCustomSources();
+      renderCustomSources();
+    });
+
+    clearCustomSourcesBtn.addEventListener('click', () => {
+      if (!customSources.length) return;
+      if (!confirm('Xoa tat ca nguon tuy chinh?')) return;
+      customSources = [];
+      saveCustomSources();
+      renderCustomSources();
+    });
+
+    renderCustomSources();
+  </script>
+</body>
+</html>
