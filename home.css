@@ -66,6 +66,16 @@ body {
   margin: 0 auto;
   padding: 2rem;
   display: grid;
+  grid-template-columns: 260px 1fr 260px; /* left sidebar, main, right sidebar */
+  gap: 2rem;
+  min-height: 100vh;
+}
+
+
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 2rem;
+  display: grid;
   grid-template-columns: 1fr 1.5fr;
   gap: 2rem;
   min-height: 100vh;
