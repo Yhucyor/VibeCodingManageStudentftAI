@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Diễn Đàn Học Tập - Student Q&A Forum</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="forum.css" />
+</head>
+<body>
+  <!-- Ambient Background Glows -->
+  <div class="glow-bg">
+    <div class="glow-sphere sphere-1"></div>
+    <div class="glow-sphere sphere-2"></div>
+  </div>
+
+  <div class="forum-container">
+    <!-- Header -->
+    <header class="forum-header">
+      <button class="back-btn" onclick="location.href='home.html'">
+        <svg viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+        <span>Quay lại Dashboard</span>
+      </button>
+
+      <div class="header-main">
+        <div class="title-area">
+          <h1>DIỄN ĐÀN THẢO LUẬN</h1>
+          <p>Nơi sinh viên trao đổi bài tập khó, đề thi cũ và nhận lời giải từ Zera AI</p>
+        </div>
+        <button class="new-thread-btn" id="openCreateBtn">
+          <svg viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+          <span>Tạo thảo luận mới</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- Main Content Layout -->
+    <div class="main-layout">
+      <!-- Left sidebar: Search and Categories -->
+      <aside class="sidebar">
+        <!-- Search -->
+        <div class="sidebar-card">
+          <h3>TÌM KIẾM CHỦ ĐỀ</h3>
+          <div class="search-box">
+            <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+            <input type="text" id="forumSearch" placeholder="Tìm câu hỏi..." autocomplete="off" />
+          </div>
+        </div>
+
+        <!-- Categories -->
+        <div class="sidebar-card">
+          <h3>CHUYÊN MỤC</h3>
+          <div class="category-list" id="categoryFilters">
+            <button class="category-item active" data-tag="all">Tất cả bài viết</button>
+            <button class="category-item" data-tag="web">Lập Trình Web</button>
+            <button class="category-item" data-tag="android">Lập Trình Android</button>
+            <button class="category-item" data-tag="dsa">DSA (Cấu trúc dữ liệu)</button>
+            <button class="category-item" data-tag="db">Cơ Sở Dữ Liệu</button>
+            <button class="category-item" data-tag="general">Thảo Luận Chung</button>
+          </div>
+        </div>
+
+        <!-- Stats Card -->
+        <div class="sidebar-card info-card">
+          <h3>TRỢ LÝ ZERA AI</h3>
+          <p>Zera AI sẽ tự động phân tích và đưa ra câu trả lời gợi ý cho mọi thảo luận học tập mới của bạn trong vòng vài giây!</p>
+          <button class="chat-ai-link-btn" onclick="location.href='assistant.html'">Nhắn trực tiếp với Zera AI →</button>
+        </div>
+      </aside>
+
+      <!-- Center column: Thread list -->
+      <main class="thread-area">
+        <div class="thread-area-header">
+          <h2>BÀI VIẾT NỔI BẬT (<span id="threadCount">0</span>)</h2>
+          <span class="active-pulse"></span>
+        </div>
+
+        <div class="threads-list" id="threadsContainer">
+          <!-- Injected dynamically -->
+        </div>
+
+        <div class="no-threads" id="noThreadsState" style="display: none;">
+          <svg viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 9h12v2H6V9zm8 5H6v-2h8v2zm4-6H6V6h12v2z"/></svg>
+          <h3>Chưa có câu hỏi nào trong chuyên mục này</h3>
+          <p>Hãy là người đầu tiên tạo thảo luận mới!</p>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <!-- Create Thread Modal Dialog -->
+  <div class="modal-overlay" id="createModal">
+    <div class="modal-card">
+      <button class="modal-close" id="closeCreateBtn">&times;</button>
+      <h2>TẠO CHỦ ĐỀ THẢO LUẬN MỚI</h2>
+      <form id="createThreadForm" class="modal-form">
+        <div class="form-group">
+          <label for="threadTitle">Tiêu đề câu hỏi</label>
+          <input type="text" id="threadTitle" placeholder="Ví dụ: Làm sao viết câu lệnh JOIN SQL để gộp 3 bảng?" required />
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="threadTag">Chuyên mục</label>
+            <select id="threadTag" required>
+              <option value="web">Lập Trình Web</option>
+              <option value="android">Lập Trình Android</option>
+              <option value="dsa">DSA (Cấu trúc dữ liệu)</option>
+              <option value="db">Cơ Sở Dữ Liệu</option>
+              <option value="general">Thảo Luận Chung</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="threadAuthor">Tên của bạn</label>
+            <input type="text" id="threadAuthor" placeholder="Ví dụ: Nguyễn Văn A" required value="Sinh viên ẩn danh" />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="threadContent">Nội dung chi tiết câu hỏi</label>
+          <textarea id="threadContent" rows="6" placeholder="Mô tả cụ thể bài tập khó hoặc thắc mắc của bạn..." required></textarea>
+        </div>
+
+        <button type="submit" class="submit-btn">Đăng thảo luận</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- View Thread Details Modal Dialog -->
+  <div class="modal-overlay" id="viewModal">
+    <div class="thread-detail-card">
+      <button class="modal-close" id="closeViewBtn">&times;</button>
+      
+      <!-- Thread Header -->
+      <div class="detail-header">
+        <span class="subject-badge" id="detailTag">MÔN HỌC</span>
+        <h2 id="detailTitle">Tiêu đề câu hỏi chi tiết</h2>
+        <div class="detail-meta">
+          Đăng bởi: <strong id="detailAuthor">Nguyễn Văn A</strong> &bull; <span id="detailDate">Hôm nay</span>
+        </div>
+      </div>
+
+      <!-- Thread Body -->
+      <div class="detail-body">
+        <p id="detailContent">Nội dung chi tiết của câu hỏi sẽ hiển thị ở đây...</p>
+      </div>
+
+      <!-- Comments Section -->
+      <div class="comments-section">
+        <h3>PHẢN HỒI (<span id="commentCount">0</span>)</h3>
+        
+        <div class="comments-list" id="commentsContainer">
+          <!-- Injected dynamically -->
+        </div>
+
+        <!-- Add Reply Form -->
+        <div class="reply-box">
+          <h4>Viết câu trả lời của bạn</h4>
+          <div class="reply-textarea-wrapper">
+            <textarea id="replyTextInput" rows="3" placeholder="Chia sẻ lời giải hoặc đóng góp ý kiến của bạn..."></textarea>
+            <button class="post-reply-btn" id="postReplyBtn">Gửi</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Forum Mock Database
+    let threadsDb = [
+      {
+        id: 1,
+        title: "Làm thế nào để fix lỗi CSS Flexbox bị tràn phần tử con trong flex-direction: column?",
+        tag: "web",
+        tagName: "Lập Trình Web",
+        author: "Trần Minh Đức",
+        date: "2 giờ trước",
+        content: "Mình đang làm giao diện Sidebar bằng CSS Flexbox định dạng dọc (flex-direction: column) nhưng phần nội dung dài bên trong cứ bị tràn xuống dưới footer chứ không tự động sinh thanh cuộn. Có ai từng gặp lỗi này chưa ạ?",
+        replies: [
+          {
+            author: "Nguyễn Hải Yến",
+            date: "1 giờ trước",
+            content: "Bạn thử thêm `min-height: 0` hoặc `overflow-y: auto` vào chính phần tử con có chứa nội dung dài ấy nhé. Mặc định flexbox đặt min-height là auto nên nó sẽ giãn vô tận để vừa khít nội dung thay vì kích hoạt thanh cuộn.",
+            isAi: false
+          },
+          {
+            author: "Zera AI (Trợ lý)",
+            date: "55 phút trước",
+            content: "Chào Đức! Lỗi tràn khung trong Flex-direction: column rất phổ biến. Hãy thực hiện theo 2 bước sau:\n1. Gán `overflow: hidden;` cho thẻ cha chứa toàn bộ khối.\n2. Gán `flex: 1; min-height: 0; overflow-y: auto;` cho thẻ con chứa văn bản để kích hoạt thanh cuộn dọc. Chúc bạn sửa thành công!",
+            isAi: true
+          }
+        ]
+      },
+      {
+        id: 2,
+        title: "Có ai có bộ đề thi mẫu môn Cấu Trúc Dữ Liệu & Giải Thuật (DSA) thầy Thái không?",
+        tag: "dsa",
+        tagName: "DSA",
+        author: "Lê Quốc Trung",
+        date: "Hôm qua",
+        content: "Tuần sau em thi giữa kỳ DSA rồi mà hoang mang quá, các anh chị khóa trên ai có đề thi mẫu hay bài tập ôn tập có đáp án của thầy Thái cho em xin với ạ. Em cảm ơn nhiều!",
+        replies: [
+          {
+            author: "Phạm Hồng Phước",
+            date: "Hôm qua",
+            content: "Em vào thẻ 'Thư Viện Số' trên portal nhé. Có bạn vừa tải lên file đề thi giữa kỳ năm 2022 của thầy Thái có đáp án chi tiết đó. Ôn kỹ phần Tree và Graph là qua dễ dàng thôi.",
+            isAi: false
+          }
+        ]
+      },
+      {
+        id: 3,
+        title: "Thắc mắc về cách dùng Android Room Database trong Coroutine",
+        tag: "android",
+        tagName: "Lập Trình Android",
+        author: "Vũ Hoàng Long",
+        date: "3 ngày trước",
+        content: "Mọi người cho mình hỏi khi gọi câu lệnh insert của Room Dao thì có bắt buộc phải chạy trong Dispatchers.IO hay là Room đã tự động chạy bất đồng bộ rồi? Mình chạy thử trực tiếp trên Main Thread vẫn được.",
+        replies: [
+          {
+            author: "Zera AI (Trợ lý)",
+            date: "3 ngày trước",
+            content: "Chào bạn Long! Kể từ các phiên bản Room mới, nếu bạn định nghĩa hàm DAO bằng từ khóa `suspend` (ví dụ: `suspend fun insert(user: User)`), Room sẽ tự động chuyển luồng xử lý xuống worker thread dưới nền cho bạn mà bạn không cần bọc thủ công trong `withContext(Dispatchers.IO)`. Tuy nhiên, nếu không dùng `suspend`, bạn bắt buộc phải thực thi bất đồng bộ để tránh bị treo ANR.",
+            isAi: true
+          }
+        ]
+      }
+    ];
+
+    // DOM Elements
+    const threadsContainer = document.getElementById('threadsContainer');
+    const threadCount = document.getElementById('threadCount');
+    const noThreadsState = document.getElementById('noThreadsState');
+    const forumSearch = document.getElementById('forumSearch');
+    const categoryFilters = document.getElementById('categoryFilters');
+
+    // Modals
+    const createModal = document.getElementById('createModal');
+    const viewModal = document.getElementById('viewModal');
+    const openCreateBtn = document.getElementById('openCreateBtn');
+    const closeCreateBtn = document.getElementById('closeCreateBtn');
+    const closeViewBtn = document.getElementById('closeViewBtn');
+
+    // Form and input
+    const createThreadForm = document.getElementById('createThreadForm');
+    const replyTextInput = document.getElementById('replyTextInput');
+    const postReplyBtn = document.getElementById('postReplyBtn');
+    const commentsContainer = document.getElementById('commentsContainer');
+    const commentCount = document.getElementById('commentCount');
+
+    // Thread Details Modal Elements
+    const detailTag = document.getElementById('detailTag');
+    const detailTitle = document.getElementById('detailTitle');
+    const detailAuthor = document.getElementById('detailAuthor');
+    const detailDate = document.getElementById('detailDate');
+    const detailContent = document.getElementById('detailContent');
+
+    let currentFilters = {
+      searchQuery: "",
+      tag: "all"
+    };
+
+    let activeThreadId = null;
+
+    // Init Page
+    function init() {
+      renderThreads();
+    }
+
+    // Render thread list
+    function renderThreads() {
+      const filtered = threadsDb.filter(t => {
+        const matchesSearch = t.title.toLowerCase().includes(currentFilters.searchQuery.toLowerCase()) || 
+                              t.author.toLowerCase().includes(currentFilters.searchQuery.toLowerCase()) ||
+                              t.content.toLowerCase().includes(currentFilters.searchQuery.toLowerCase());
+        const matchesTag = currentFilters.tag === 'all' || t.tag === currentFilters.tag;
+        return matchesSearch && matchesTag;
+      });
+
+      // Update count
+      threadCount.textContent = filtered.length;
+
+      // Clean
+      threadsContainer.innerHTML = "";
+
+      if (filtered.length === 0) {
+        noThreadsState.style.display = "flex";
+        threadsContainer.style.display = "none";
+      } else {
+        noThreadsState.style.display = "none";
+        threadsContainer.style.display = "flex";
+
+        // Sort by ID descending (newest first)
+        const sorted = [...filtered].sort((a, b) => b.id - a.id);
+
+        sorted.forEach(t => {
+          const card = document.createElement('div');
+          card.className = "thread-card";
+          card.innerHTML = `
+            <div class="thread-card-top">
+              <span class="subject-badge tag-${t.tag}">${t.tagName}</span>
+              <span class="thread-card-date">${t.date}</span>
+            </div>
+            <h3 class="thread-card-title">${t.title}</h3>
+            <p class="thread-card-desc">${t.content}</p>
+            <div class="thread-card-bottom">
+              <span class="author-info">Đăng bởi: <strong>${t.author}</strong></span>
+              <div class="card-stats">
+                <svg viewBox="0 0 24 24" class="reply-icon"><path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 9h12v2H6V9zm8 5H6v-2h8v2zm4-6H6V6h12v2z"/></svg>
+                <span>${t.replies.length} phản hồi</span>
+              </div>
+              <button class="view-btn" onclick="openThread(${t.id})">Tham gia thảo luận</button>
+            </div>
+          `;
+          threadsContainer.appendChild(card);
+        });
+      }
+    }
+
+    // Filters
+    forumSearch.addEventListener('input', (e) => {
+      currentFilters.searchQuery = e.target.value;
+      renderThreads();
+    });
+
+    categoryFilters.addEventListener('click', (e) => {
+      if (e.target.classList.contains('category-item')) {
+        document.querySelectorAll('#categoryFilters .category-item').forEach(item => item.classList.remove('active'));
+        e.target.classList.add('active');
+        currentFilters.tag = e.target.getAttribute('data-tag');
+        renderThreads();
+      }
+    });
+
+    // Modals open/close
+    openCreateBtn.addEventListener('click', () => {
+      createModal.classList.add('active');
+      document.body.style.overflow = 'hidden';
+    });
+
+    closeCreateBtn.addEventListener('click', () => {
+      createModal.classList.remove('active');
+      document.body.style.overflow = 'auto';
+    });
+
+    closeViewBtn.addEventListener('click', () => {
+      viewModal.classList.remove('active');
+      document.body.style.overflow = 'auto';
+    });
+
+    // Create new thread action
+    createThreadForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+
+      const titleInput = document.getElementById('threadTitle');
+      const tagSelect = document.getElementById('threadTag');
+      const authorInput = document.getElementById('threadAuthor');
+      const contentTextarea = document.getElementById('threadContent');
+
+      const selectedTag = tagSelect.value;
+      const selectedTagName = tagSelect.options[tagSelect.selectedIndex].text;
+
+      const newId = threadsDb.length + 1;
+      const newThread = {
+        id: newId,
+        title: titleInput.value,
+        tag: selectedTag,
+        tagName: selectedTagName,
+        author: authorInput.value || "Sinh viên ẩn danh",
+        date: "Vừa xong",
+        content: contentTextarea.value,
+        replies: []
+      };
+
+      // Add to Database
+      threadsDb.push(newThread);
+
+      // Simulate Zera AI Instant auto-response
+      setTimeout(() => {
+        const target = threadsDb.find(t => t.id === newId);
+        if (target) {
+          target.replies.push({
+            author: "Zera AI (Trợ lý)",
+            date: "Vừa xong",
+            content: `Chào ${newThread.author}! Tôi đã tiếp nhận câu hỏi "${newThread.title}" của bạn. Đây là một chủ đề liên quan đến ${newThread.tagName}. Tôi gợi ý bạn hãy kiểm tra lại bài học gần nhất hoặc tải đề thi thử tương ứng ở phần 'Thư Viện Số' để luyện tập thêm nhé!`,
+            isAi: true
+          });
+          // Update thread list display & details if open
+          renderThreads();
+          if (activeThreadId === newId) {
+            renderComments(target);
+          }
+        }
+      }, 3000);
+
+      // Reset & Close
+      createThreadForm.reset();
+      createModal.classList.remove('active');
+      document.body.style.overflow = 'auto';
+
+      renderThreads();
+    });
+
+    // Open single Thread view
+    window.openThread = function(id) {
+      const thread = threadsDb.find(t => t.id === id);
+      if (!thread) return;
+
+      activeThreadId = id;
+
+      // Populate details
+      detailTitle.textContent = thread.title;
+      detailTag.textContent = thread.tagName.toUpperCase();
+      detailTag.className = `subject-badge tag-${thread.tag}`;
+      detailAuthor.textContent = thread.author;
+      detailDate.textContent = thread.date;
+      detailContent.textContent = thread.content;
+
+      renderComments(thread);
+
+      // Open Modal
+      viewModal.classList.add('active');
+      document.body.style.overflow = 'hidden';
+    };
+
+    // Render comment list inside details modal
+    function renderComments(thread) {
+      commentsContainer.innerHTML = "";
+      commentCount.textContent = thread.replies.length;
+
+      if (thread.replies.length === 0) {
+        commentsContainer.innerHTML = `<div class="no-comments">Chưa có phản hồi nào. Hãy viết phản hồi đầu tiên bên dưới!</div>`;
+      } else {
+        thread.replies.forEach(r => {
+          const item = document.createElement('div');
+          item.className = `comment-item ${r.isAi ? 'ai-reply' : ''}`;
+          item.innerHTML = `
+            <div class="comment-top">
+              <div class="comment-author">
+                <span class="avatar-letter">${r.author.charAt(0)}</span>
+                <strong>${r.author}</strong>
+                ${r.isAi ? '<span class="ai-badge">AI BOT</span>' : ''}
+              </div>
+              <span class="comment-date">${r.date}</span>
+            </div>
+            <div class="comment-body">
+              <p>${r.content.replace(/\n/g, '<br>')}</p>
+            </div>
+          `;
+          commentsContainer.appendChild(item);
+        });
+      }
+    }
+
+    // Post comment reply
+    postReplyBtn.addEventListener('click', () => {
+      if (!activeThreadId) return;
+
+      const replyContent = replyTextInput.value.trim();
+      if (!replyContent) return;
+
+      const thread = threadsDb.find(t => t.id === activeThreadId);
+      if (thread) {
+        thread.replies.push({
+          author: "Tôi",
+          date: "Vừa xong",
+          content: replyContent,
+          isAi: false
+        });
+
+        // Reset text area
+        replyTextInput.value = "";
+
+        // Re-render comments & general list
+        renderComments(thread);
+        renderThreads();
+      }
+    });
+
+    // Close on overlay click
+    createModal.addEventListener('click', (e) => {
+      if (e.target === createModal) {
+        createModal.classList.remove('active');
+        document.body.style.overflow = 'auto';
+      }
+    });
+
+    viewModal.addEventListener('click', (e) => {
+      if (e.target === viewModal) {
+        viewModal.classList.remove('active');
+        document.body.style.overflow = 'auto';
+      }
+    });
+
+    // Run
+    init();
+  </script>
+</body>
+</html>

@@ -1,0 +1,720 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Student Assistant - Quan li bang diem</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="grades.css" />
+  <script defer src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+</head>
+<body>
+  <div class="glow-bg">
+    <div class="glow-sphere sphere-1"></div>
+    <div class="glow-sphere sphere-2"></div>
+  </div>
+
+  <main class="grade-shell">
+    <header class="grade-topbar">
+      <button class="icon-button" type="button" onclick="location.href='home.html'" title="Quay lai trang chu">
+        <svg viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.42-1.41L7.83 13H20v-2z"/></svg>
+      </button>
+      <div>
+        <span class="eyebrow">Grade Tracker</span>
+        <h1>Quan li bang diem</h1>
+      </div>
+      <button class="icon-button accent" type="button" id="exportBtn" title="Xuat du lieu">
+        <svg viewBox="0 0 24 24"><path d="M5 20h14v-2H5v2zM19 9h-4V3H9v6H5l7 7 7-7z"/></svg>
+      </button>
+    </header>
+
+    <section class="grade-layout">
+      <aside class="side-panel">
+        <section class="glass-panel">
+          <div class="panel-icon">
+            <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-2 10H7v-2h10v2zm0-4H7V7h10v2zm0 8H7v-2h10v2z"/></svg>
+          </div>
+          <h2>Them diem mon hoc</h2>
+          <p>Nhap diem thanh phan, he thong tu tinh diem tong ket, GPA va tinh trang qua mon.</p>
+          <form id="gradeForm" class="grade-form">
+            <input id="subjectInput" type="text" placeholder="Ten mon hoc" required />
+            <div class="form-grid">
+              <input id="semesterInput" type="text" placeholder="Hoc ky" value="HK1-2026" required />
+              <input id="creditInput" type="number" min="1" max="10" step="1" placeholder="Tin chi" required />
+            </div>
+            <div class="form-grid three">
+              <input id="processInput" type="number" min="0" max="10" step="0.1" placeholder="QT" required />
+              <input id="midtermInput" type="number" min="0" max="10" step="0.1" placeholder="GK" required />
+              <input id="finalInput" type="number" min="0" max="10" step="0.1" placeholder="CK" required />
+            </div>
+            <button class="primary-button" type="submit">
+              <svg viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+              Luu diem
+            </button>
+          </form>
+        </section>
+
+        <section class="glass-panel compact">
+          <div class="section-title">
+            <h2>Nguon quet diem</h2>
+            <button class="text-button" type="button" id="sampleBtn">Nap mau</button>
+          </div>
+          <div class="scan-source-grid">
+            <label class="scan-source" for="gradeImageInput">
+              <input id="gradeImageInput" type="file" accept="image/*" />
+              <svg viewBox="0 0 24 24"><path d="M19.35 10.04A7.49 7.49 0 0 0 5 8.5 6 6 0 0 0 6 20h13a5 5 0 0 0 .35-9.96zM13 13v4h-2v-4H8l4-4 4 4h-3z"/></svg>
+              <span>Anh bang diem</span>
+            </label>
+            <label class="scan-source" for="gradeFileInput">
+              <input id="gradeFileInput" type="file" accept=".csv,.txt" />
+              <svg viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zm1 9h-4v4H9v-4H5V9h4V5h2v4h4v2z"/></svg>
+              <span>File CSV/TXT</span>
+            </label>
+          </div>
+          <div class="scan-state" id="scanState">Co the quet anh, nap file CSV/TXT hoac dan noi dung vao o ben duoi.</div>
+          <img id="gradeImagePreview" class="scan-preview" alt="Anh bang diem vua quet" />
+          <textarea id="csvInput" placeholder="Ten mon, Hoc ky, Tin chi, QT, GK, CK"></textarea>
+          <button class="ghost-button full" type="button" id="importBtn">Nhap vao bang diem</button>
+        </section>
+      </aside>
+
+      <section class="main-panel">
+        <div class="summary-grid">
+          <article class="summary-card hero">
+            <span>GPA he 4</span>
+            <strong id="gpa4">0.00</strong>
+            <small id="rankText">Chua co du lieu</small>
+          </article>
+          <article class="summary-card">
+            <span>Diem TB he 10</span>
+            <strong id="avg10">0.00</strong>
+          </article>
+          <article class="summary-card">
+            <span>Tong tin chi</span>
+            <strong id="totalCredits">0</strong>
+          </article>
+          <article class="summary-card">
+            <span>Can chu y</span>
+            <strong id="riskCount">0</strong>
+          </article>
+        </div>
+
+        <div class="toolbar">
+          <div class="tabs" role="tablist">
+            <button class="tab-btn active" type="button" data-view="table">Bang diem</button>
+            <button class="tab-btn" type="button" data-view="semester">Hoc ky</button>
+            <button class="tab-btn" type="button" data-view="chart">Bieu do</button>
+            <button class="tab-btn" type="button" data-view="insight">Goi y</button>
+          </div>
+          <div class="toolbar-actions">
+            <select id="semesterFilter" aria-label="Loc hoc ky">
+              <option value="all">Tat ca hoc ky</option>
+            </select>
+            <button class="ghost-button" type="button" id="sortBtn">Sap xep GPA</button>
+            <button class="ghost-button danger" type="button" id="clearBtn">Xoa het</button>
+          </div>
+        </div>
+
+        <div class="view active" id="tableView">
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Mon hoc</th>
+                  <th>Hoc ky</th>
+                  <th>TC</th>
+                  <th>QT</th>
+                  <th>GK</th>
+                  <th>CK</th>
+                  <th>Tong</th>
+                  <th>GPA</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody id="gradeRows"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="view" id="semesterView">
+          <div class="semester-grid" id="semesterCards"></div>
+        </div>
+
+        <div class="view" id="chartView">
+          <div class="chart-grid">
+            <section class="chart-card wide">
+              <div class="chart-title">
+                <h2>GPA theo hoc ky</h2>
+                <span id="gpaTrendLabel">Chua co du lieu</span>
+              </div>
+              <canvas id="gpaChart" width="900" height="320"></canvas>
+            </section>
+            <section class="chart-card">
+              <div class="chart-title">
+                <h2>Phan bo diem chu</h2>
+                <span id="letterChartLabel">0 mon</span>
+              </div>
+              <canvas id="letterChart" width="420" height="320"></canvas>
+            </section>
+            <section class="chart-card">
+              <div class="chart-title">
+                <h2>Tin chi dat muc</h2>
+                <span id="creditChartLabel">0 tin chi</span>
+              </div>
+              <canvas id="creditChart" width="420" height="320"></canvas>
+            </section>
+          </div>
+        </div>
+
+        <div class="view" id="insightView">
+          <div class="insight-grid">
+            <section class="insight-card">
+              <h2>Mon can uu tien</h2>
+              <div id="priorityList" class="list-view"></div>
+            </section>
+            <section class="insight-card">
+              <h2>Ke hoach cai thien</h2>
+              <div id="planList" class="list-view"></div>
+            </section>
+          </div>
+        </div>
+      </section>
+    </section>
+  </main>
+
+  <script>
+    const weights = { process: 0.2, midterm: 0.3, final: 0.5 };
+    const sampleCsv = `Lap trinh Web,HK1-2026,3,8.5,7.8,9
+Co so du lieu,HK1-2026,3,7.4,7,8.1
+Toan roi rac,HK1-2026,2,5.8,5.2,5.5
+Cau truc du lieu,HK2-2026,3,6.8,7.1,7.4`;
+
+    const state = {
+      courses: JSON.parse(localStorage.getItem('gradeTracker.courses') || '[]'),
+      sortDesc: true
+    };
+
+    const gradeRows = document.getElementById('gradeRows');
+    const semesterCards = document.getElementById('semesterCards');
+    const priorityList = document.getElementById('priorityList');
+    const planList = document.getElementById('planList');
+    const semesterFilter = document.getElementById('semesterFilter');
+    const csvInput = document.getElementById('csvInput');
+    const scanState = document.getElementById('scanState');
+    const gradeImagePreview = document.getElementById('gradeImagePreview');
+    const chartPalette = ['#10b981', '#3b82f6', '#8b5cf6', '#f59e0b', '#ef4444', '#ec4899', '#14b8a6'];
+
+    function saveState() {
+      localStorage.setItem('gradeTracker.courses', JSON.stringify(state.courses));
+    }
+
+    function clampScore(value) {
+      const number = Number(value);
+      if (Number.isNaN(number)) return 0;
+      return Math.min(10, Math.max(0, number));
+    }
+
+    function totalScore(course) {
+      return round1(course.process * weights.process + course.midterm * weights.midterm + course.final * weights.final);
+    }
+
+    function gpaPoint(score) {
+      if (score >= 8.5) return 4;
+      if (score >= 8) return 3.5;
+      if (score >= 7) return 3;
+      if (score >= 6.5) return 2.5;
+      if (score >= 5.5) return 2;
+      if (score >= 5) return 1.5;
+      if (score >= 4) return 1;
+      return 0;
+    }
+
+    function letterGrade(score) {
+      if (score >= 8.5) return 'A';
+      if (score >= 8) return 'B+';
+      if (score >= 7) return 'B';
+      if (score >= 6.5) return 'C+';
+      if (score >= 5.5) return 'C';
+      if (score >= 5) return 'D+';
+      if (score >= 4) return 'D';
+      return 'F';
+    }
+
+    function round1(value) {
+      return Math.round(value * 10) / 10;
+    }
+
+    function round2(value) {
+      return Math.round(value * 100) / 100;
+    }
+
+    function filteredCourses() {
+      const selected = semesterFilter.value;
+      return selected === 'all' ? [...state.courses] : state.courses.filter(course => course.semester === selected);
+    }
+
+    function weightedAverage(courses, mapper) {
+      const credits = courses.reduce((sum, course) => sum + course.credits, 0);
+      if (!credits) return 0;
+      return courses.reduce((sum, course) => sum + mapper(course) * course.credits, 0) / credits;
+    }
+
+    function rankFromGpa(gpa) {
+      if (gpa >= 3.6) return 'Xuat sac';
+      if (gpa >= 3.2) return 'Gioi';
+      if (gpa >= 2.5) return 'Kha';
+      if (gpa >= 2) return 'Trung binh';
+      if (gpa > 0) return 'Can cai thien';
+      return 'Chua co du lieu';
+    }
+
+    function render() {
+      renderFilter();
+      renderSummary();
+      renderTable();
+      renderSemesters();
+      renderCharts();
+      renderInsights();
+      saveState();
+    }
+
+    function renderFilter() {
+      const current = semesterFilter.value || 'all';
+      const semesters = [...new Set(state.courses.map(course => course.semester))].sort();
+      semesterFilter.innerHTML = '<option value="all">Tat ca hoc ky</option>' + semesters.map(semester => `<option value="${escapeHtml(semester)}">${escapeHtml(semester)}</option>`).join('');
+      semesterFilter.value = semesters.includes(current) ? current : 'all';
+    }
+
+    function renderSummary() {
+      const courses = filteredCourses();
+      const credits = courses.reduce((sum, course) => sum + course.credits, 0);
+      const avg10 = weightedAverage(courses, totalScore);
+      const gpa4 = weightedAverage(courses, course => gpaPoint(totalScore(course)));
+      const risks = courses.filter(course => totalScore(course) < 6.5).length;
+
+      document.getElementById('avg10').textContent = round2(avg10).toFixed(2);
+      document.getElementById('gpa4').textContent = round2(gpa4).toFixed(2);
+      document.getElementById('totalCredits').textContent = credits;
+      document.getElementById('riskCount').textContent = risks;
+      document.getElementById('rankText').textContent = rankFromGpa(gpa4);
+    }
+
+    function renderTable() {
+      const courses = filteredCourses().sort((a, b) => {
+        const diff = gpaPoint(totalScore(a)) - gpaPoint(totalScore(b));
+        return state.sortDesc ? -diff : diff;
+      });
+
+      gradeRows.innerHTML = courses.length ? courses.map(course => {
+        const score = totalScore(course);
+        const gpa = gpaPoint(score);
+        return `<tr>
+          <td><strong>${escapeHtml(course.subject)}</strong><span>${score >= 5 ? 'Da qua' : 'Can hoc lai'}</span></td>
+          <td>${escapeHtml(course.semester)}</td>
+          <td>${course.credits}</td>
+          <td>${course.process.toFixed(1)}</td>
+          <td>${course.midterm.toFixed(1)}</td>
+          <td>${course.final.toFixed(1)}</td>
+          <td><b>${score.toFixed(1)}</b></td>
+          <td><span class="grade-pill ${score < 5 ? 'danger' : score < 6.5 ? 'warn' : 'good'}">${letterGrade(score)} / ${gpa.toFixed(1)}</span></td>
+          <td><button class="delete-btn" type="button" data-delete="${course.id}" title="Xoa mon"><svg viewBox="0 0 24 24"><path d="M18.3 5.71 12 12l6.3 6.29-1.41 1.41L10.59 13.41 4.29 19.71 2.88 18.3 9.17 12 2.88 5.71 4.29 4.29l6.3 6.3 6.29-6.3 1.42 1.42z"/></svg></button></td>
+        </tr>`;
+      }).join('') : '<tr><td colspan="9" class="empty-cell">Chua co diem. Hay them mon hoc dau tien.</td></tr>';
+    }
+
+    function renderSemesters() {
+      const groups = [...new Set(state.courses.map(course => course.semester))].sort();
+      semesterCards.innerHTML = groups.length ? groups.map(semester => {
+        const courses = state.courses.filter(course => course.semester === semester);
+        const avg = weightedAverage(courses, totalScore);
+        const gpa = weightedAverage(courses, course => gpaPoint(totalScore(course)));
+        const credits = courses.reduce((sum, course) => sum + course.credits, 0);
+        return `<article class="semester-card">
+          <span>${escapeHtml(semester)}</span>
+          <strong>${round2(gpa).toFixed(2)} GPA</strong>
+          <div class="meter"><i style="width:${Math.min(100, avg * 10)}%"></i></div>
+          <small>${credits} tin chi - TB ${round2(avg).toFixed(2)}/10</small>
+        </article>`;
+      }).join('') : '<div class="empty-state">Chua co hoc ky nao.</div>';
+    }
+
+    function renderInsights() {
+      const sorted = [...filteredCourses()].sort((a, b) => totalScore(a) - totalScore(b));
+      const priority = sorted.filter(course => totalScore(course) < 7).slice(0, 4);
+
+      priorityList.innerHTML = priority.length ? priority.map(course => {
+        const score = totalScore(course);
+        return `<article class="list-item">
+          <div><strong>${escapeHtml(course.subject)}</strong><span>${escapeHtml(course.semester)} - ${score.toFixed(1)}/10</span></div>
+          <span class="mini-badge">${course.credits} TC</span>
+        </article>`;
+      }).join('') : '<div class="empty-state">Bang diem dang on dinh.</div>';
+
+      planList.innerHTML = sorted.slice(0, 4).map(course => {
+        const score = totalScore(course);
+        const needed = Math.max(0, round1((6.5 - course.process * weights.process - course.midterm * weights.midterm) / weights.final));
+        const message = score >= 6.5
+          ? 'Duy tri on tap va nop bai dung han.'
+          : `Can diem CK khoang ${Math.min(10, needed).toFixed(1)} de dat moc 6.5.`;
+        return `<article class="list-item">
+          <div><strong>${escapeHtml(course.subject)}</strong><span>${message}</span></div>
+        </article>`;
+      }).join('') || '<div class="empty-state">Them diem de xem goi y.</div>';
+    }
+
+    function renderCharts() {
+      const courses = filteredCourses();
+      drawGpaChart(courses);
+      drawLetterChart(courses);
+      drawCreditChart(courses);
+    }
+
+    function getCanvasContext(id) {
+      const canvas = document.getElementById(id);
+      const context = canvas.getContext('2d');
+      context.clearRect(0, 0, canvas.width, canvas.height);
+      return { canvas, context };
+    }
+
+    function drawEmptyChart(id, message) {
+      const { canvas, context } = getCanvasContext(id);
+      context.fillStyle = 'rgba(255, 255, 255, 0.55)';
+      context.font = '600 18px Inter, sans-serif';
+      context.textAlign = 'center';
+      context.fillText(message, canvas.width / 2, canvas.height / 2);
+    }
+
+    function drawGpaChart(courses) {
+      const groups = [...new Set(courses.map(course => course.semester))].sort();
+      if (!groups.length) {
+        document.getElementById('gpaTrendLabel').textContent = 'Chua co du lieu';
+        drawEmptyChart('gpaChart', 'Them diem de hien thi xu huong GPA');
+        return;
+      }
+
+      const points = groups.map(semester => {
+        const semesterCourses = courses.filter(course => course.semester === semester);
+        return {
+          semester,
+          gpa: weightedAverage(semesterCourses, course => gpaPoint(totalScore(course)))
+        };
+      });
+
+      const { canvas, context } = getCanvasContext('gpaChart');
+      const padding = { left: 54, right: 28, top: 28, bottom: 58 };
+      const width = canvas.width - padding.left - padding.right;
+      const height = canvas.height - padding.top - padding.bottom;
+      const step = width / Math.max(1, points.length - 1);
+
+      document.getElementById('gpaTrendLabel').textContent = `${points.length} hoc ky`;
+      drawGrid(context, padding, width, height, 4);
+
+      const coordinates = points.map((point, index) => ({
+        x: padding.left + step * index,
+        y: padding.top + height - (point.gpa / 4) * height,
+        ...point
+      }));
+
+      context.strokeStyle = '#10b981';
+      context.lineWidth = 4;
+      context.beginPath();
+      coordinates.forEach((point, index) => {
+        if (index === 0) context.moveTo(point.x, point.y);
+        else context.lineTo(point.x, point.y);
+      });
+      context.stroke();
+
+      coordinates.forEach((point) => {
+        context.fillStyle = '#10b981';
+        context.beginPath();
+        context.arc(point.x, point.y, 7, 0, Math.PI * 2);
+        context.fill();
+        context.fillStyle = '#ffffff';
+        context.font = '700 14px Inter, sans-serif';
+        context.textAlign = 'center';
+        context.fillText(round2(point.gpa).toFixed(2), point.x, point.y - 14);
+        context.fillStyle = 'rgba(255, 255, 255, 0.68)';
+        context.font = '600 12px Inter, sans-serif';
+        context.fillText(point.semester, point.x, canvas.height - 22);
+      });
+    }
+
+    function drawGrid(context, padding, width, height, maxValue) {
+      context.strokeStyle = 'rgba(255, 255, 255, 0.08)';
+      context.fillStyle = 'rgba(255, 255, 255, 0.48)';
+      context.lineWidth = 1;
+      context.font = '600 12px Inter, sans-serif';
+      context.textAlign = 'right';
+
+      for (let index = 0; index <= 4; index++) {
+        const value = (maxValue / 4) * index;
+        const y = padding.top + height - (value / maxValue) * height;
+        context.beginPath();
+        context.moveTo(padding.left, y);
+        context.lineTo(padding.left + width, y);
+        context.stroke();
+        context.fillText(value.toFixed(1), padding.left - 12, y + 4);
+      }
+    }
+
+    function drawLetterChart(courses) {
+      if (!courses.length) {
+        document.getElementById('letterChartLabel').textContent = '0 mon';
+        drawEmptyChart('letterChart', 'Chua co diem chu');
+        return;
+      }
+
+      const buckets = {};
+      courses.forEach((course) => {
+        const letter = letterGrade(totalScore(course));
+        buckets[letter] = (buckets[letter] || 0) + 1;
+      });
+
+      const entries = Object.entries(buckets);
+      document.getElementById('letterChartLabel').textContent = `${courses.length} mon`;
+      drawDonut('letterChart', entries, courses.length, 'mon');
+    }
+
+    function drawCreditChart(courses) {
+      if (!courses.length) {
+        document.getElementById('creditChartLabel').textContent = '0 tin chi';
+        drawEmptyChart('creditChart', 'Chua co tin chi');
+        return;
+      }
+
+      const passed = courses.filter(course => totalScore(course) >= 5).reduce((sum, course) => sum + course.credits, 0);
+      const warning = courses.filter(course => totalScore(course) >= 5 && totalScore(course) < 6.5).reduce((sum, course) => sum + course.credits, 0);
+      const failed = courses.filter(course => totalScore(course) < 5).reduce((sum, course) => sum + course.credits, 0);
+      const strong = Math.max(0, passed - warning);
+      const total = strong + warning + failed;
+
+      document.getElementById('creditChartLabel').textContent = `${total} tin chi`;
+      drawDonut('creditChart', [['On dinh', strong], ['Can chu y', warning], ['Nguy co', failed]].filter(([, value]) => value > 0), total, 'TC');
+    }
+
+    function drawDonut(id, entries, total, unit) {
+      const { canvas, context } = getCanvasContext(id);
+      const centerX = 150;
+      const centerY = 150;
+      const radius = 92;
+      let start = -Math.PI / 2;
+
+      entries.forEach(([label, value], index) => {
+        const angle = (value / total) * Math.PI * 2;
+        context.beginPath();
+        context.strokeStyle = chartPalette[index % chartPalette.length];
+        context.lineWidth = 34;
+        context.arc(centerX, centerY, radius, start, start + angle);
+        context.stroke();
+        start += angle;
+      });
+
+      context.fillStyle = '#ffffff';
+      context.font = '800 28px Inter, sans-serif';
+      context.textAlign = 'center';
+      context.fillText(total, centerX, centerY + 4);
+      context.fillStyle = 'rgba(255, 255, 255, 0.55)';
+      context.font = '700 12px Inter, sans-serif';
+      context.fillText(unit, centerX, centerY + 26);
+
+      entries.forEach(([label, value], index) => {
+        const x = 292;
+        const y = 76 + index * 38;
+        context.fillStyle = chartPalette[index % chartPalette.length];
+        context.beginPath();
+        roundedRect(context, x, y - 10, 18, 18, 5);
+        context.fill();
+        context.fillStyle = '#ffffff';
+        context.font = '700 13px Inter, sans-serif';
+        context.textAlign = 'left';
+        context.fillText(`${label}: ${value}`, x + 28, y + 4);
+      });
+    }
+
+    function roundedRect(context, x, y, width, height, radius) {
+      context.moveTo(x + radius, y);
+      context.lineTo(x + width - radius, y);
+      context.quadraticCurveTo(x + width, y, x + width, y + radius);
+      context.lineTo(x + width, y + height - radius);
+      context.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
+      context.lineTo(x + radius, y + height);
+      context.quadraticCurveTo(x, y + height, x, y + height - radius);
+      context.lineTo(x, y + radius);
+      context.quadraticCurveTo(x, y, x + radius, y);
+    }
+
+    function addCourse(course) {
+      state.courses.push({
+        id: crypto.randomUUID(),
+        subject: course.subject.trim(),
+        semester: course.semester.trim() || 'Chua ro',
+        credits: Math.max(1, Number(course.credits) || 1),
+        process: clampScore(course.process),
+        midterm: clampScore(course.midterm),
+        final: clampScore(course.final)
+      });
+    }
+
+    function parseCsv(text) {
+      return text.split(/\n+/).map(line => line.trim()).filter(Boolean).map(parseGradeLine).filter(Boolean);
+    }
+
+    function parseGradeLine(line) {
+      const commaParts = line.split(',').map(part => part.trim());
+      if (commaParts.length >= 6) {
+        const [subject, semester, credits, process, midterm, final] = commaParts;
+        return subject && semester ? { subject, semester, credits, process, midterm, final } : null;
+      }
+
+      const normalized = line.replace(/\s+/g, ' ').trim();
+      const scores = normalized.match(/\b\d{1,2}(?:[.,]\d)?\b/g)?.map(value => Number(value.replace(',', '.'))) || [];
+      if (scores.length < 4) return null;
+
+      const final = scores.pop();
+      const midterm = scores.pop();
+      const process = scores.pop();
+      const credits = scores.pop();
+      const semesterMatch = normalized.match(/\bHK\s*\d(?:[-/]\s*\d{4})?|\b20\d{2}[-/]\d{4}\b|\bHK\d[-/]\d{4}\b/i);
+      const semester = semesterMatch ? semesterMatch[0].replace(/\s+/g, '') : 'Tu-quet';
+      const subject = normalized
+        .replace(semesterMatch?.[0] || '', '')
+        .replace(/\b\d{1,2}(?:[.,]\d)?\b/g, '')
+        .replace(/diem|tin chi|tc|qt|gk|ck/ig, '')
+        .trim() || 'Mon hoc quet';
+
+      return { subject, semester, credits, process, midterm, final };
+    }
+
+    async function scanImageFile(file) {
+      if (!window.Tesseract) {
+        scanState.textContent = 'OCR chua tai xong. Hay thu lai sau vai giay hoac dung file CSV/TXT.';
+        return;
+      }
+
+      gradeImagePreview.src = URL.createObjectURL(file);
+      gradeImagePreview.classList.add('show');
+      scanState.textContent = 'Dang quet anh bang diem...';
+      const result = await Tesseract.recognize(file, 'vie+eng', {
+        logger: (message) => {
+          if (message.status === 'recognizing text') {
+            scanState.textContent = `Dang nhan dien: ${Math.round(message.progress * 100)}%`;
+          }
+        }
+      });
+
+      csvInput.value = result.data.text.trim();
+      const rows = parseCsv(csvInput.value);
+      scanState.textContent = rows.length
+        ? `Da doc duoc ${rows.length} dong diem. Bam Nhap vao bang diem de luu.`
+        : 'Da quet anh, nhung can sua lai van ban truoc khi nhap.';
+    }
+
+    async function loadTextFile(file) {
+      csvInput.value = await file.text();
+      const rows = parseCsv(csvInput.value);
+      scanState.textContent = rows.length
+        ? `Da nap ${rows.length} dong diem tu file.`
+        : 'File da nap nhung chua co dong diem hop le.';
+    }
+
+    function escapeHtml(value) {
+      return String(value).replace(/[&<>"']/g, char => ({
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#039;'
+      }[char]));
+    }
+
+    document.getElementById('gradeForm').addEventListener('submit', (event) => {
+      event.preventDefault();
+      addCourse({
+        subject: document.getElementById('subjectInput').value,
+        semester: document.getElementById('semesterInput').value,
+        credits: document.getElementById('creditInput').value,
+        process: document.getElementById('processInput').value,
+        midterm: document.getElementById('midtermInput').value,
+        final: document.getElementById('finalInput').value
+      });
+      event.currentTarget.reset();
+      document.getElementById('semesterInput').value = 'HK1-2026';
+      render();
+    });
+
+    document.getElementById('sampleBtn').addEventListener('click', () => {
+      csvInput.value = sampleCsv;
+      scanState.textContent = 'Da nap du lieu mau.';
+    });
+
+    document.getElementById('importBtn').addEventListener('click', () => {
+      const rows = parseCsv(csvInput.value);
+      rows.forEach(addCourse);
+      csvInput.value = '';
+      scanState.textContent = rows.length ? `Da them ${rows.length} mon vao bang diem.` : 'Chua tim thay dong diem hop le.';
+      render();
+    });
+
+    document.getElementById('gradeImageInput').addEventListener('change', (event) => {
+      const file = event.target.files[0];
+      if (!file) return;
+      scanImageFile(file).catch((error) => {
+        console.error(error);
+        scanState.textContent = 'Khong the quet anh nay. Hay thu anh ro hon hoac dan noi dung thu cong.';
+      });
+    });
+
+    document.getElementById('gradeFileInput').addEventListener('change', (event) => {
+      const file = event.target.files[0];
+      if (!file) return;
+      loadTextFile(file).catch((error) => {
+        console.error(error);
+        scanState.textContent = 'Khong the doc file nay.';
+      });
+    });
+
+    document.getElementById('sortBtn').addEventListener('click', () => {
+      state.sortDesc = !state.sortDesc;
+      renderTable();
+    });
+
+    document.getElementById('clearBtn').addEventListener('click', () => {
+      if (!confirm('Xoa toan bo bang diem hien tai?')) return;
+      state.courses = [];
+      render();
+    });
+
+    document.getElementById('exportBtn').addEventListener('click', async () => {
+      const lines = state.courses.map(course => [course.subject, course.semester, course.credits, course.process, course.midterm, course.final].join(','));
+      const output = ['Ten mon,Hoc ky,Tin chi,QT,GK,CK', ...lines].join('\n');
+      try {
+        await navigator.clipboard.writeText(output);
+        alert('Da copy bang diem CSV vao clipboard.');
+      } catch {
+        alert(output);
+      }
+    });
+
+    semesterFilter.addEventListener('change', render);
+
+    document.querySelector('.toolbar').addEventListener('click', (event) => {
+      const button = event.target.closest('.tab-btn');
+      if (!button) return;
+      document.querySelectorAll('.tab-btn').forEach(tab => tab.classList.remove('active'));
+      document.querySelectorAll('.view').forEach(view => view.classList.remove('active'));
+      button.classList.add('active');
+      document.getElementById(`${button.dataset.view}View`).classList.add('active');
+    });
+
+    document.body.addEventListener('click', (event) => {
+      const deleteButton = event.target.closest('[data-delete]');
+      if (!deleteButton) return;
+      state.courses = state.courses.filter(course => course.id !== deleteButton.dataset.delete);
+      render();
+    });
+
+    render();
+  </script>
+</body>
+</html>

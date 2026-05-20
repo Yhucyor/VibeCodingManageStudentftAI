@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Student Assistant - Thoi khoa bieu</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="schedule.css" />
+  <script defer src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+</head>
+<body>
+  <div class="glow-bg">
+    <div class="glow-sphere sphere-1"></div>
+    <div class="glow-sphere sphere-2"></div>
+  </div>
+
+  <main class="schedule-shell">
+    <header class="schedule-topbar">
+      <button class="icon-button" type="button" onclick="location.href='home.html'" title="Quay lai trang chu">
+        <svg viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.42-1.41L7.83 13H20v-2z"/></svg>
+      </button>
+      <div>
+        <span class="eyebrow">Smart Schedule</span>
+        <h1>Thoi khoa bieu thong minh</h1>
+      </div>
+      <button class="icon-button accent" type="button" id="notifyBtn" title="Bat nhac lich">
+        <svg viewBox="0 0 24 24"><path d="M12 22a2.5 2.5 0 0 0 2.45-2h-4.9A2.5 2.5 0 0 0 12 22zm6-6v-5c0-3.07-1.63-5.64-4.5-6.32V4a1.5 1.5 0 0 0-3 0v.68C7.64 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/></svg>
+      </button>
+    </header>
+
+    <section class="workspace-grid">
+      <aside class="upload-panel">
+        <div class="upload-card">
+          <div class="upload-icon">
+            <svg viewBox="0 0 24 24"><path d="M19.35 10.04A7.49 7.49 0 0 0 5 8.5 6 6 0 0 0 6 20h13a5 5 0 0 0 .35-9.96zM13 13v4h-2v-4H8l4-4 4 4h-3z"/></svg>
+          </div>
+          <h2>Upload anh thoi khoa bieu</h2>
+          <p>He thong se doc chu trong anh va chuyen thanh bang lich tren web. Anh ro net, chup thang bang se cho ket qua tot hon.</p>
+          <label class="drop-zone" for="scheduleImage" id="dropZone">
+            <input type="file" id="scheduleImage" accept="image/*" />
+            <span>Chon anh hoac keo tha vao day</span>
+            <small>PNG, JPG, WEBP</small>
+          </label>
+          <div class="ocr-state" id="ocrState">Chua co anh nao duoc tai len.</div>
+          <img id="imagePreview" class="image-preview" alt="Anh thoi khoa bieu vua upload" />
+        </div>
+
+        <div class="manual-card">
+          <div class="section-title">
+            <h2>Hieu chinh nhanh</h2>
+            <button class="text-button" type="button" id="loadSampleBtn">Nap mau</button>
+          </div>
+          <textarea id="ocrText" placeholder="Van ban OCR se nam o day. Ban co the sua lai roi bam Chuyen thanh lich."></textarea>
+          <button class="primary-button" type="button" id="parseBtn">
+            <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-1 4-6 4-6-4V5l6 4 6-4v2z"/></svg>
+            Chuyen thanh lich
+          </button>
+        </div>
+      </aside>
+
+      <section class="schedule-panel">
+        <div class="summary-row">
+          <div class="summary-card">
+            <span id="todayLabel">Hom nay</span>
+            <strong id="todayCount">0 tiet</strong>
+          </div>
+          <div class="summary-card">
+            <span>Mon hoc</span>
+            <strong id="subjectCount">0</strong>
+          </div>
+          <div class="summary-card">
+            <span>Nhac tiep theo</span>
+            <strong id="nextReminder">Chua co</strong>
+          </div>
+        </div>
+
+        <div class="toolbar">
+          <div class="tabs" role="tablist">
+            <button class="tab-btn active" type="button" data-view="grid">Bang tuan</button>
+            <button class="tab-btn" type="button" data-view="today">Hom nay</button>
+            <button class="tab-btn" type="button" data-view="tasks">Nhac nho</button>
+          </div>
+          <div class="toolbar-actions">
+            <button class="ghost-button" type="button" id="sortBtn">Sap xep</button>
+            <button class="ghost-button" type="button" id="clearBtn">Xoa lich</button>
+          </div>
+        </div>
+
+        <div class="view active" id="gridView">
+          <div class="timetable" id="timetable"></div>
+        </div>
+
+        <div class="view" id="todayView">
+          <div class="list-view" id="todayList"></div>
+        </div>
+
+        <div class="view" id="tasksView">
+          <form class="reminder-form" id="reminderForm">
+            <input id="reminderTitle" type="text" placeholder="Noi dung nhac nho" required />
+            <input id="reminderTime" type="datetime-local" required />
+            <button class="primary-button compact" type="submit">Them</button>
+          </form>
+          <div class="list-view" id="reminderList"></div>
+        </div>
+
+        <form class="add-class-form" id="classForm">
+          <input id="subjectInput" type="text" placeholder="Ten mon" required />
+          <select id="dayInput" required>
+            <option value="Mon">Thu 2</option>
+            <option value="Tue">Thu 3</option>
+            <option value="Wed">Thu 4</option>
+            <option value="Thu">Thu 5</option>
+            <option value="Fri">Thu 6</option>
+            <option value="Sat">Thu 7</option>
+          </select>
+          <input id="timeInput" type="text" placeholder="07:30-09:10" required />
+          <input id="roomInput" type="text" placeholder="Phong" />
+          <button class="primary-button compact" type="submit">Them lop</button>
+        </form>
+      </section>
+    </section>
+  </main>
+
+  <script>
+    const dayLabels = {
+      Mon: 'Thu 2',
+      Tue: 'Thu 3',
+      Wed: 'Thu 4',
+      Thu: 'Thu 5',
+      Fri: 'Thu 6',
+      Sat: 'Thu 7'
+    };
+
+    const dayAliases = [
+      { key: 'Mon', names: ['thu 2', 'thu hai', 'monday', 't2'] },
+      { key: 'Tue', names: ['thu 3', 'thu ba', 'tuesday', 't3'] },
+      { key: 'Wed', names: ['thu 4', 'thu tu', 'wednesday', 't4'] },
+      { key: 'Thu', names: ['thu 5', 'thu nam', 'thursday', 't5'] },
+      { key: 'Fri', names: ['thu 6', 'thu sau', 'friday', 't6'] },
+      { key: 'Sat', names: ['thu 7', 'thu bay', 'saturday', 't7'] }
+    ];
+
+    const sampleText = `Thu 2 07:30-09:10 Lap trinh Web A1-302
+Thu 2 09:20-11:00 Co so du lieu B2-105
+Thu 3 13:00-15:30 Tieng Anh chuyen nganh C1-204
+Thu 4 07:30-10:00 Cau truc du lieu A4-401
+Thu 5 09:20-11:00 Toan roi rac Online
+Thu 6 13:00-16:00 Do an nhom Lab E2`;
+
+    const state = {
+      classes: JSON.parse(localStorage.getItem('smartSchedule.classes') || '[]'),
+      reminders: JSON.parse(localStorage.getItem('smartSchedule.reminders') || '[]')
+    };
+
+    const imageInput = document.getElementById('scheduleImage');
+    const imagePreview = document.getElementById('imagePreview');
+    const ocrState = document.getElementById('ocrState');
+    const ocrText = document.getElementById('ocrText');
+    const timetable = document.getElementById('timetable');
+    const todayList = document.getElementById('todayList');
+    const reminderList = document.getElementById('reminderList');
+
+    function saveState() {
+      localStorage.setItem('smartSchedule.classes', JSON.stringify(state.classes));
+      localStorage.setItem('smartSchedule.reminders', JSON.stringify(state.reminders));
+    }
+
+    function normalizeText(value) {
+      return value
+        .toLowerCase()
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .replace(/đ/g, 'd');
+    }
+
+    function parseScheduleText(text) {
+      const lines = text.split(/\n+/).map(line => line.trim()).filter(Boolean);
+      const parsed = [];
+      let activeDay = '';
+
+      lines.forEach((line) => {
+        const normalized = normalizeText(line).replace(/\s+/g, ' ');
+        const foundDay = dayAliases.find(day => day.names.some(name => normalized.includes(name)));
+        if (foundDay) activeDay = foundDay.key;
+
+        const timeMatch = line.match(/(\d{1,2}[:h]\d{2})\s*[-–]\s*(\d{1,2}[:h]\d{2})/i);
+        if (!activeDay || !timeMatch) return;
+
+        const subjectRaw = line
+          .replace(/thu\s*[2-7]|t[2-7]|monday|tuesday|wednesday|thursday|friday|saturday/ig, '')
+          .replace(timeMatch[0], '')
+          .trim();
+
+        const roomMatch = subjectRaw.match(/\b([A-Z]\d[-.]?\d{2,4}|Lab\s*\w+|Online|Zoom|Meet|P\.\s*\w+)/i);
+        const subjectBase = subjectRaw.replace(roomMatch?.[0] || '', '').trim();
+        const parts = subjectBase.split(/\s{2,}| - |, /).filter(Boolean);
+        const subject = (parts[0] || subjectBase || 'Mon hoc moi').trim();
+        const room = roomMatch ? roomMatch[0].trim() : '';
+
+        parsed.push({
+          id: crypto.randomUUID(),
+          subject,
+          day: activeDay,
+          time: `${timeMatch[1].replace('h', ':')}-${timeMatch[2].replace('h', ':')}`,
+          room,
+          note: 'Tu anh upload'
+        });
+      });
+
+      return parsed;
+    }
+
+    async function runOcr(file) {
+      if (!window.Tesseract) {
+        ocrState.textContent = 'OCR chua tai xong. Kiem tra ket noi mang hoac thu lai sau vai giay.';
+        return;
+      }
+
+      ocrState.textContent = 'Dang doc anh...';
+      const result = await Tesseract.recognize(file, 'vie+eng', {
+        logger: (m) => {
+          if (m.status === 'recognizing text') {
+            ocrState.textContent = `Dang nhan dien: ${Math.round(m.progress * 100)}%`;
+          }
+        }
+      });
+
+      ocrText.value = result.data.text.trim();
+      const parsed = parseScheduleText(ocrText.value);
+      if (parsed.length) {
+        state.classes = mergeClasses(state.classes, parsed);
+        saveState();
+        render();
+        ocrState.textContent = `Da chuyen ${parsed.length} lich hoc tu anh.`;
+      } else {
+        ocrState.textContent = 'Da doc anh, nhung can sua lai van ban roi bam Chuyen thanh lich.';
+      }
+    }
+
+    function mergeClasses(current, incoming) {
+      const seen = new Set(current.map(item => `${item.day}|${item.time}|${normalizeText(item.subject)}`));
+      const merged = [...current];
+      incoming.forEach((item) => {
+        const key = `${item.day}|${item.time}|${normalizeText(item.subject)}`;
+        if (!seen.has(key)) merged.push(item);
+      });
+      return merged;
+    }
+
+    function sortClasses() {
+      const dayOrder = Object.keys(dayLabels);
+      state.classes.sort((a, b) => {
+        const dayDiff = dayOrder.indexOf(a.day) - dayOrder.indexOf(b.day);
+        return dayDiff || a.time.localeCompare(b.time);
+      });
+    }
+
+    function todayKey() {
+      return ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'][new Date().getDay()];
+    }
+
+    function render() {
+      sortClasses();
+      renderGrid();
+      renderToday();
+      renderReminders();
+      renderSummary();
+      saveState();
+    }
+
+    function renderGrid() {
+      timetable.innerHTML = Object.entries(dayLabels).map(([key, label]) => {
+        const classes = state.classes.filter(item => item.day === key);
+        const rows = classes.length ? classes.map(renderClassCard).join('') : '<div class="empty-slot">Chua co lich</div>';
+        return `<section class="day-column"><h3>${label}</h3>${rows}</section>`;
+      }).join('');
+    }
+
+    function renderClassCard(item) {
+      return `<article class="class-card">
+        <button class="delete-class" type="button" data-delete-class="${item.id}" title="Xoa mon">
+          <svg viewBox="0 0 24 24"><path d="M18.3 5.71 12 12l6.3 6.29-1.41 1.41L10.59 13.41 4.29 19.71 2.88 18.3 9.17 12 2.88 5.71 4.29 4.29l6.3 6.3 6.29-6.3 1.42 1.42z"/></svg>
+        </button>
+        <strong>${escapeHtml(item.subject)}</strong>
+        <span>${escapeHtml(item.time)}</span>
+        <small>${escapeHtml(item.room || 'Chua co phong')}</small>
+      </article>`;
+    }
+
+    function renderToday() {
+      const current = todayKey();
+      const items = state.classes.filter(item => item.day === current);
+      todayList.innerHTML = items.length ? items.map(item => `
+        <article class="list-item">
+          <div><strong>${escapeHtml(item.subject)}</strong><span>${dayLabels[item.day]} - ${escapeHtml(item.time)} - ${escapeHtml(item.room || 'Chua co phong')}</span></div>
+          <button class="ghost-button mini" type="button" data-remind-class="${item.id}">Nhac</button>
+        </article>
+      `).join('') : '<div class="empty-state">Hom nay chua co lich hoc.</div>';
+    }
+
+    function renderReminders() {
+      state.reminders.sort((a, b) => new Date(a.time) - new Date(b.time));
+      reminderList.innerHTML = state.reminders.length ? state.reminders.map(item => `
+        <article class="list-item">
+          <div><strong>${escapeHtml(item.title)}</strong><span>${formatDateTime(item.time)}</span></div>
+          <button class="ghost-button mini" type="button" data-delete-reminder="${item.id}">Xoa</button>
+        </article>
+      `).join('') : '<div class="empty-state">Chua co nhac nho nao.</div>';
+    }
+
+    function renderSummary() {
+      const current = todayKey();
+      const todayClasses = state.classes.filter(item => item.day === current);
+      const uniqueSubjects = new Set(state.classes.map(item => normalizeText(item.subject)));
+      const next = state.reminders.find(item => new Date(item.time) > new Date());
+      document.getElementById('todayLabel').textContent = dayLabels[current] || 'Hom nay';
+      document.getElementById('todayCount').textContent = `${todayClasses.length} tiet`;
+      document.getElementById('subjectCount').textContent = uniqueSubjects.size;
+      document.getElementById('nextReminder').textContent = next ? formatDateTime(next.time, true) : 'Chua co';
+    }
+
+    function formatDateTime(value, short = false) {
+      const date = new Date(value);
+      if (Number.isNaN(date.getTime())) return 'Khong hop le';
+      return date.toLocaleString('vi-VN', {
+        day: '2-digit',
+        month: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+        ...(short ? {} : { year: 'numeric' })
+      });
+    }
+
+    function escapeHtml(value) {
+      return String(value).replace(/[&<>"']/g, char => ({
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#039;'
+      }[char]));
+    }
+
+    imageInput.addEventListener('change', (event) => {
+      const file = event.target.files[0];
+      if (!file) return;
+      imagePreview.src = URL.createObjectURL(file);
+      imagePreview.classList.add('show');
+      runOcr(file).catch((error) => {
+        console.error(error);
+        ocrState.textContent = 'Khong the OCR anh nay. Hay sua/nhap noi dung thu cong roi chuyen thanh lich.';
+      });
+    });
+
+    document.getElementById('dropZone').addEventListener('dragover', (event) => {
+      event.preventDefault();
+      event.currentTarget.classList.add('dragging');
+    });
+
+    document.getElementById('dropZone').addEventListener('dragleave', (event) => {
+      event.currentTarget.classList.remove('dragging');
+    });
+
+    document.getElementById('dropZone').addEventListener('drop', (event) => {
+      event.preventDefault();
+      event.currentTarget.classList.remove('dragging');
+      const file = event.dataTransfer.files[0];
+      if (!file) return;
+      imageInput.files = event.dataTransfer.files;
+      imageInput.dispatchEvent(new Event('change'));
+    });
+
+    document.getElementById('parseBtn').addEventListener('click', () => {
+      const parsed = parseScheduleText(ocrText.value);
+      state.classes = mergeClasses(state.classes, parsed);
+      ocrState.textContent = parsed.length ? `Da chuyen ${parsed.length} lich hoc.` : 'Chua tim thay dong lich hop le.';
+      render();
+    });
+
+    document.getElementById('loadSampleBtn').addEventListener('click', () => {
+      ocrText.value = sampleText;
+      document.getElementById('parseBtn').click();
+    });
+
+    document.getElementById('sortBtn').addEventListener('click', render);
+
+    document.getElementById('clearBtn').addEventListener('click', () => {
+      if (!confirm('Xoa tat ca lich hoc hien tai?')) return;
+      state.classes = [];
+      render();
+    });
+
+    document.getElementById('classForm').addEventListener('submit', (event) => {
+      event.preventDefault();
+      state.classes.push({
+        id: crypto.randomUUID(),
+        subject: document.getElementById('subjectInput').value.trim(),
+        day: document.getElementById('dayInput').value,
+        time: document.getElementById('timeInput').value.trim(),
+        room: document.getElementById('roomInput').value.trim(),
+        note: 'Nhap thu cong'
+      });
+      event.currentTarget.reset();
+      render();
+    });
+
+    document.getElementById('reminderForm').addEventListener('submit', (event) => {
+      event.preventDefault();
+      state.reminders.push({
+        id: crypto.randomUUID(),
+        title: document.getElementById('reminderTitle').value.trim(),
+        time: document.getElementById('reminderTime').value
+      });
+      event.currentTarget.reset();
+      render();
+    });
+
+    document.getElementById('notifyBtn').addEventListener('click', async () => {
+      if (!('Notification' in window)) {
+        alert('Trinh duyet hien tai chua ho tro thong bao.');
+        return;
+      }
+      const result = await Notification.requestPermission();
+      alert(result === 'granted' ? 'Da bat quyen thong bao.' : 'Chua duoc cap quyen thong bao.');
+    });
+
+    document.querySelector('.toolbar').addEventListener('click', (event) => {
+      const button = event.target.closest('.tab-btn');
+      if (!button) return;
+      document.querySelectorAll('.tab-btn').forEach(tab => tab.classList.remove('active'));
+      document.querySelectorAll('.view').forEach(view => view.classList.remove('active'));
+      button.classList.add('active');
+      document.getElementById(`${button.dataset.view}View`).classList.add('active');
+    });
+
+    document.body.addEventListener('click', (event) => {
+      const deleteClass = event.target.closest('[data-delete-class]');
+      const deleteReminder = event.target.closest('[data-delete-reminder]');
+      const remindClass = event.target.closest('[data-remind-class]');
+
+      if (deleteClass) {
+        state.classes = state.classes.filter(item => item.id !== deleteClass.dataset.deleteClass);
+        render();
+      }
+
+      if (deleteReminder) {
+        state.reminders = state.reminders.filter(item => item.id !== deleteReminder.dataset.deleteReminder);
+        render();
+      }
+
+      if (remindClass) {
+        const item = state.classes.find(row => row.id === remindClass.dataset.remindClass);
+        if (!item) return;
+        const soon = new Date(Date.now() + 30 * 60 * 1000);
+        state.reminders.push({
+          id: crypto.randomUUID(),
+          title: `Hoc ${item.subject} luc ${item.time}`,
+          time: toLocalInputValue(soon)
+        });
+        render();
+      }
+    });
+
+    function toLocalInputValue(date) {
+      const offsetDate = new Date(date.getTime() - date.getTimezoneOffset() * 60000);
+      return offsetDate.toISOString().slice(0, 16);
+    }
+
+    setInterval(() => {
+      if (!('Notification' in window) || Notification.permission !== 'granted') return;
+      const now = Date.now();
+      state.reminders.forEach((item) => {
+        const due = new Date(item.time).getTime();
+        if (!item.sent && due <= now && due > now - 60000) {
+          new Notification('Nhac nho hoc tap', { body: item.title });
+          item.sent = true;
+          saveState();
+        }
+      });
+    }, 30000);
+
+    render();
+  </script>
+</body>
+</html>

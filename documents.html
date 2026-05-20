@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Thư Viện Số - Digital Library</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="documents.css" />
+</head>
+<body>
+  <!-- Ambient Background Glows -->
+  <div class="glow-bg">
+    <div class="glow-sphere sphere-1"></div>
+    <div class="glow-sphere sphere-2"></div>
+    <div class="glow-sphere sphere-3"></div>
+  </div>
+
+  <div class="library-container">
+    <!-- Header -->
+    <header class="library-header">
+      <button class="back-btn" onclick="location.href='home.html'">
+        <svg viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+        <span>Quay lại Dashboard</span>
+      </button>
+
+      <div class="header-main">
+        <div class="title-area">
+          <h1>THƯ VIỆN SỐ THÔNG MINH</h1>
+          <p>Tìm kiếm giáo trình, đề thi cũ và tài liệu học tập được kiểm duyệt</p>
+        </div>
+        <button class="ask-ai-btn" onclick="location.href='assistant.html'">
+          <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17h-2v-2h2v2zm2.07-7.75l-.9.92C13.45 12.9 13 13.5 13 15h-2v-.5c0-1.1.45-2.1 1.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.41 0-1.1-.9-2-2-2s-2 .9-2 2H7c0-2.76 2.24-5 5-5s5 2.24 5 5c0 1.04-.42 1.99-1.07 2.75z"/></svg>
+          <span>Hỏi Trợ lý Zera AI</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- Stats Dashboard Row -->
+    <section class="stats-row">
+      <div class="stat-card">
+        <div class="stat-icon purple-glow">
+          <svg viewBox="0 0 24 24"><path d="M4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm16-4H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H8V4h12v12z"/></svg>
+        </div>
+        <div class="stat-info">
+          <span class="stat-val" id="totalDocsCount">120+</span>
+          <span class="stat-lbl">Tài liệu lưu trữ</span>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon pink-glow">
+          <svg viewBox="0 0 24 24"><path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM17 13l-5 5-5-5h3V9h4v4h3z"/></svg>
+        </div>
+        <div class="stat-info">
+          <span class="stat-val">3,820</span>
+          <span class="stat-lbl">Lượt tải về</span>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon blue-glow">
+          <svg viewBox="0 0 24 24"><path d="M12 11.55C9.64 9.35 6.48 8 3 8v11c3.48 0 6.64 1.35 9 3.55 2.36-2.2 5.52-3.55 9-3.55V8c-3.48 0-6.64 1.35-9 3.55zM12 2c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3z"/></svg>
+        </div>
+        <div class="stat-info">
+          <span class="stat-val">A1-302</span>
+          <span class="stat-lbl">Môn học yêu thích</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Search and Filters Panel -->
+    <section class="search-panel">
+      <div class="search-input-wrapper">
+        <svg viewBox="0 0 24 24" class="search-icon"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+        <input type="text" id="searchInput" placeholder="Nhập tên tài liệu, môn học, giáo viên..." autocomplete="off" />
+        <button class="clear-search-btn" id="clearSearchBtn" style="display: none;">&times;</button>
+      </div>
+
+      <div class="filters-wrapper">
+        <!-- Type Filter Buttons -->
+        <div class="filter-group">
+          <span class="filter-label">Loại tài liệu:</span>
+          <div class="filter-options" id="typeFilters">
+            <button class="filter-opt active" data-type="all">Tất cả</button>
+            <button class="filter-opt" data-type="slide">Slide Bài Giảng</button>
+            <button class="filter-opt" data-type="exam">Đề Thi Cũ</button>
+            <button class="filter-opt" data-type="book">Giáo Trình / Sách</button>
+          </div>
+        </div>
+
+        <!-- Subject Select Filter -->
+        <div class="filter-group select-group">
+          <span class="filter-label">Môn học:</span>
+          <select id="subjectSelect">
+            <option value="all">Tất cả môn học</option>
+            <option value="web">Lập Trình Web (Web Dev)</option>
+            <option value="android">Lập Trình Di Động (Android)</option>
+            <option value="dsa">Cấu Trúc Dữ Liệu & Giải Thuật (DSA)</option>
+            <option value="db">Cơ Sở Dữ Liệu (Database)</option>
+            <option value="network">Mạng Máy Tính (Computer Network)</option>
+          </select>
+        </div>
+      </div>
+    </section>
+
+    <!-- Grid Container -->
+    <main class="documents-section">
+      <div class="section-title">
+        <h2>TÀI LIỆU HIỆN CÓ (<span id="resultsCount">0</span>)</h2>
+        <span class="pulse-indicator"></span>
+      </div>
+
+      <!-- Grid of Document Cards -->
+      <div class="documents-grid" id="documentsGrid">
+        <!-- Injected via JavaScript -->
+      </div>
+
+      <!-- No Results State -->
+      <div class="no-results" id="noResultsState" style="display: none;">
+        <div class="no-results-icon">
+          <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
+        </div>
+        <h3>Không tìm thấy tài liệu phù hợp</h3>
+        <p>Thử tìm kiếm với từ khóa khác hoặc lọc theo bộ môn khác.</p>
+        <button class="ask-ai-fallback-btn" onclick="location.href='assistant.html'">
+          Hỏi Zera AI tìm tài liệu giúp bạn
+        </button>
+      </div>
+    </main>
+  </div>
+
+  <!-- Document Preview Modal Overlay -->
+  <div class="preview-modal-overlay" id="previewModal">
+    <div class="preview-card">
+      <button class="close-modal-btn" id="closeModalBtn">&times;</button>
+      <div class="modal-body">
+        <div class="modal-left">
+          <div class="preview-doc-icon" id="modalDocIcon">PDF</div>
+          <div class="preview-doc-details">
+            <span class="preview-tag" id="modalTag">MÔN HỌC</span>
+            <h2 id="modalTitle">Tên tài liệu mẫu</h2>
+            <p class="instructor">Giảng viên: <strong id="modalInstructor">ThS. Nguyễn Văn A</strong></p>
+            <div class="meta-grid">
+              <div>
+                <span>Dung lượng</span>
+                <strong id="modalSize">2.4 MB</strong>
+              </div>
+              <div>
+                <span>Định dạng</span>
+                <strong id="modalFormat">PDF File</strong>
+              </div>
+              <div>
+                <span>Năm học</span>
+                <strong id="modalYear">2024</strong>
+              </div>
+              <div>
+                <span>Lượt tải</span>
+                <strong id="modalDownloads">124</strong>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-right">
+          <h3>TÓM TẮT TÀI LIỆU (AI GENERATED)</h3>
+          <p class="summary-text" id="modalSummary">
+            Tài liệu này bao gồm lý thuyết trọng tâm kèm các bài tập thực hành chi tiết. Rất thích hợp cho việc ôn thi cuối kỳ và củng cố kiến thức nền tảng.
+          </p>
+          <div class="action-buttons">
+            <button class="download-confirm-btn" id="downloadConfirmBtn">
+              <svg viewBox="0 0 24 24"><path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM17 13l-5 5-5-5h3V9h4v4h3z"/></svg>
+              <span>Tải xuống ngay</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Document Database
+    const documentsDb = [
+      {
+        id: 1,
+        title: "Đề thi cuối kỳ Lập trình Web - Học kỳ 1 (2023 - 2024)",
+        type: "exam",
+        typeText: "Đề Thi Cũ",
+        subject: "web",
+        subjectName: "Lập Trình Web",
+        instructor: "TS. Lê Hoàng Anh",
+        size: "1.2 MB",
+        format: "PDF",
+        year: "2023",
+        downloads: 342,
+        summary: "Đề thi gồm 2 phần: Lý thuyết trắc nghiệm (3 điểm) về HTTP protocol, DOM, CSS Grid/Flexbox và phần Thực hành viết ứng dụng Single Page App bằng Vanilla JS kết nối API (7 điểm)."
+      },
+      {
+        id: 2,
+        title: "Slide bài giảng Chương 4: ReactJS & State Management",
+        type: "slide",
+        typeText: "Slide Bài Giảng",
+        subject: "web",
+        subjectName: "Lập Trình Web",
+        instructor: "TS. Lê Hoàng Anh",
+        size: "4.8 MB",
+        format: "PPTX",
+        year: "2024",
+        downloads: 512,
+        summary: "Bài giảng chi tiết về cơ chế Virtual DOM của React, cách dùng Hook cơ bản (useState, useEffect, useContext), vòng đời component và quản lý state tập trung."
+      },
+      {
+        id: 3,
+        title: "Đề thi giữa kỳ Cấu trúc dữ liệu & Giải thuật (DSA) - 2022",
+        type: "exam",
+        typeText: "Đề Thi Cũ",
+        subject: "dsa",
+        subjectName: "Cấu Trúc Dữ Liệu & Giải Thuật",
+        instructor: "PGS. TS. Trần Minh Thái",
+        size: "950 KB",
+        format: "PDF",
+        year: "2022",
+        downloads: 219,
+        summary: "Đề thi kiểm tra kiến thức về Độ phức tạp thuật toán (Big O), cấu trúc danh sách liên kết đơn/kép, hàng đợi, ngăn xếp và các thuật toán sắp xếp cơ bản (QuickSort, MergeSort)."
+      },
+      {
+        id: 4,
+        title: "Giáo trình Cấu trúc dữ liệu & Giải thuật lý thuyết & thực hành",
+        type: "book",
+        typeText: "Giáo Trình",
+        subject: "dsa",
+        subjectName: "Cấu Trúc Dữ Liệu & Giải Thuật",
+        instructor: "Khoa CNTT - HCMUTE",
+        size: "15.4 MB",
+        format: "PDF",
+        year: "2021",
+        downloads: 810,
+        summary: "Sách giáo trình chuẩn của khoa CNTT, cung cấp lý thuyết chi tiết kết hợp mã nguồn thực hành minh họa bằng ngôn ngữ C++ và Java."
+      },
+      {
+        id: 5,
+        title: "Slide bài giảng Lập trình di động Android - Full Slides 2023",
+        type: "slide",
+        typeText: "Slide Bài Giảng",
+        subject: "android",
+        subjectName: "Lập Trình Di Động",
+        instructor: "ThS. Phạm Tuấn Anh",
+        size: "12.1 MB",
+        format: "ZIP",
+        year: "2023",
+        downloads: 405,
+        summary: "Trọn bộ 8 chương bài giảng Android, từ cấu trúc Activity/Fragment, thiết kế giao diện XML, Jetpack Compose, làm việc với database Room và Retrofit API Client."
+      },
+      {
+        id: 6,
+        title: "Đề thi mẫu môn Cơ sở dữ liệu cuối kỳ - Đáp án chi tiết",
+        type: "exam",
+        typeText: "Đề Thi Cũ",
+        subject: "db",
+        subjectName: "Cơ Sở Dữ Liệu",
+        instructor: "Cô Nguyễn Thị Mai",
+        size: "1.8 MB",
+        format: "PDF",
+        year: "2024",
+        downloads: 620,
+        summary: "Đề thi kèm đáp án giải chi tiết từng bước cho phần vẽ sơ đồ thực thể mối quan hệ ERD, chuyển đổi sang mô hình quan hệ, chuẩn hóa dạng 1NF, 2NF, 3NF và viết các câu truy vấn SQL."
+      },
+      {
+        id: 7,
+        title: "Giáo trình Thiết kế mạng máy tính doanh nghiệp CISCO",
+        type: "book",
+        typeText: "Giáo Trình",
+        subject: "network",
+        subjectName: "Mạng Máy Tính",
+        instructor: "ThS. Bùi Quốc Nam",
+        size: "8.6 MB",
+        format: "PDF",
+        year: "2022",
+        downloads: 189,
+        summary: "Sách chuyên khảo về thiết kế hạ tầng mạng LAN/WAN, chia subnet, cấu hình định tuyến động OSPF, EIGRP, bảo mật mạng với ACL và NAT trên thiết bị mạng Cisco."
+      },
+      {
+        id: 8,
+        title: "Slide hướng dẫn thực hành Mạng máy tính: Wireshark & Socket",
+        type: "slide",
+        typeText: "Slide Bài Giảng",
+        subject: "network",
+        subjectName: "Mạng Máy Tính",
+        instructor: "ThS. Bùi Quốc Nam",
+        size: "3.2 MB",
+        format: "PDF",
+        year: "2023",
+        downloads: 295,
+        summary: "Hướng dẫn thực hành phân tích các gói tin HTTP, TCP, UDP bằng công cụ Wireshark và bài tập lập trình Socket TCP/IP Client-Server cơ bản bằng Python."
+      }
+    ];
+
+    // DOM Elements
+    const searchInput = document.getElementById('searchInput');
+    const clearSearchBtn = document.getElementById('clearSearchBtn');
+    const typeFilters = document.getElementById('typeFilters');
+    const subjectSelect = document.getElementById('subjectSelect');
+    const documentsGrid = document.getElementById('documentsGrid');
+    const resultsCount = document.getElementById('resultsCount');
+    const totalDocsCount = document.getElementById('totalDocsCount');
+    const noResultsState = document.getElementById('noResultsState');
+
+    // Modal Elements
+    const previewModal = document.getElementById('previewModal');
+    const closeModalBtn = document.getElementById('closeModalBtn');
+    const modalDocIcon = document.getElementById('modalDocIcon');
+    const modalTag = document.getElementById('modalTag');
+    const modalTitle = document.getElementById('modalTitle');
+    const modalInstructor = document.getElementById('modalInstructor');
+    const modalSize = document.getElementById('modalSize');
+    const modalFormat = document.getElementById('modalFormat');
+    const modalYear = document.getElementById('modalYear');
+    const modalDownloads = document.getElementById('modalDownloads');
+    const modalSummary = document.getElementById('modalSummary');
+    const downloadConfirmBtn = document.getElementById('downloadConfirmBtn');
+
+    let currentFilters = {
+      searchQuery: "",
+      type: "all",
+      subject: "all"
+    };
+
+    // Initialize Page
+    function init() {
+      // Merge custom documents from Search Scraper in localStorage
+      try {
+        const customDocs = JSON.parse(localStorage.getItem('customDocuments')) || [];
+        customDocs.forEach(customDoc => {
+          if (!documentsDb.some(d => d.id === customDoc.id || d.title === customDoc.title)) {
+            documentsDb.unshift(customDoc);
+          }
+        });
+      } catch (e) {
+        console.error("Error loading custom documents:", e);
+      }
+
+      totalDocsCount.textContent = documentsDb.length;
+      renderDocuments();
+    }
+
+    // Render Database Items
+    function renderDocuments() {
+      const filtered = documentsDb.filter(doc => {
+        const matchesSearch = doc.title.toLowerCase().includes(currentFilters.searchQuery.toLowerCase()) || 
+                              doc.instructor.toLowerCase().includes(currentFilters.searchQuery.toLowerCase()) ||
+                              doc.subjectName.toLowerCase().includes(currentFilters.searchQuery.toLowerCase());
+        const matchesType = currentFilters.type === 'all' || doc.type === currentFilters.type;
+        const matchesSubject = currentFilters.subject === 'all' || doc.subject === currentFilters.subject;
+        return matchesSearch && matchesType && matchesSubject;
+      });
+
+      // Update Result Count
+      resultsCount.textContent = filtered.length;
+
+      // Clean Grid
+      documentsGrid.innerHTML = "";
+
+      if (filtered.length === 0) {
+        noResultsState.style.display = "flex";
+        documentsGrid.style.display = "none";
+      } else {
+        noResultsState.style.display = "none";
+        documentsGrid.style.display = "grid";
+
+        filtered.forEach(doc => {
+          const card = document.createElement('div');
+          card.className = "document-card";
+          card.innerHTML = `
+            <div class="card-top">
+              <span class="subject-badge subject-${doc.subject}">${doc.subjectName}</span>
+              <span class="file-format-badge format-${doc.format.toLowerCase()}">${doc.format}</span>
+            </div>
+            <h3 class="doc-title">${doc.title}</h3>
+            <div class="doc-metadata">
+              <div class="meta-item">
+                <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+                <span>${doc.instructor}</span>
+              </div>
+              <div class="meta-item">
+                <svg viewBox="0 0 24 24"><path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM19 18H6c-2.21 0-4-1.79-4-4 0-2.05 1.53-3.76 3.56-3.97l1.07-.11.5-.95C8.08 7.14 9.94 6 12 6c2.62 0 4.88 1.86 5.39 4.43l.3 1.5 1.53.11c1.56.1 2.78 1.41 2.78 2.96 0 1.65-1.35 3-3 3z"/></svg>
+                <span>${doc.size}</span>
+              </div>
+            </div>
+            <div class="card-actions">
+              <button class="action-btn preview" onclick="openPreview(${doc.id})">Xem chi tiết</button>
+              <button class="action-btn download" onclick="handleDownload(${doc.id})">Tải xuống</button>
+            </div>
+          `;
+          documentsGrid.appendChild(card);
+        });
+      }
+    }
+
+    // Search events
+    searchInput.addEventListener('input', (e) => {
+      currentFilters.searchQuery = e.target.value;
+      clearSearchBtn.style.display = e.target.value ? 'block' : 'none';
+      renderDocuments();
+    });
+
+    clearSearchBtn.addEventListener('click', () => {
+      searchInput.value = "";
+      currentFilters.searchQuery = "";
+      clearSearchBtn.style.display = 'none';
+      renderDocuments();
+      searchInput.focus();
+    });
+
+    // Type Filter buttons
+    typeFilters.addEventListener('click', (e) => {
+      if (e.target.classList.contains('filter-opt')) {
+        document.querySelectorAll('#typeFilters .filter-opt').forEach(opt => opt.classList.remove('active'));
+        e.target.classList.add('active');
+        currentFilters.type = e.target.getAttribute('data-type');
+        renderDocuments();
+      }
+    });
+
+    // Subject dropdown selection
+    subjectSelect.addEventListener('change', (e) => {
+      currentFilters.subject = e.target.value;
+      renderDocuments();
+    });
+
+    // Open Summary Preview Modal
+    window.openPreview = function(id) {
+      const doc = documentsDb.find(d => d.id === id);
+      if (!doc) return;
+
+      modalTitle.textContent = doc.title;
+      modalTag.textContent = doc.subjectName.toUpperCase();
+      modalTag.className = `preview-tag subject-${doc.subject}`;
+      modalInstructor.textContent = doc.instructor;
+      modalSize.textContent = doc.size;
+      modalFormat.textContent = `${doc.format} File`;
+      modalYear.textContent = doc.year;
+      modalDownloads.textContent = doc.downloads;
+      modalSummary.textContent = doc.summary;
+      modalDocIcon.textContent = doc.format;
+      modalDocIcon.className = `preview-doc-icon format-${doc.format.toLowerCase()}`;
+
+      // Download button setup
+      downloadConfirmBtn.onclick = () => {
+        handleDownload(doc.id);
+        closePreview();
+      };
+
+      previewModal.classList.add('active');
+      document.body.style.overflow = 'hidden';
+    };
+
+    function closePreview() {
+      previewModal.classList.remove('active');
+      document.body.style.overflow = 'auto';
+    }
+
+    closeModalBtn.addEventListener('click', closePreview);
+    previewModal.addEventListener('click', (e) => {
+      if (e.target === previewModal) closePreview();
+    });
+
+    // Mock Download Action
+    window.handleDownload = function(id) {
+      const doc = documentsDb.find(d => d.id === id);
+      if (!doc) return;
+
+      // Increment local download count visual
+      doc.downloads++;
+      renderDocuments();
+
+      // Create dummy file download simulation
+      const element = document.createElement('a');
+      const fileContent = `Mô phỏng tài liệu học tập của môn ${doc.subjectName}.\nTên file: ${doc.title}\nGiảng viên: ${doc.instructor}\nTải bởi: Cổng Thông Tin Sinh Viên.`;
+      const file = new Blob([fileContent], {type: 'text/plain'});
+      element.href = URL.createObjectURL(file);
+      element.download = `${doc.title.replace(/\s+/g, '_')}.txt`;
+      document.body.appendChild(element);
+      element.click();
+      document.body.removeChild(element);
+    };
+
+    // Run on start
+    init();
+  </script>
+</body>
+</html>

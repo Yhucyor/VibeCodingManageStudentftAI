@@ -1,0 +1,317 @@
+/* Global Styles */
+html, body {
+  height: 100%;
+  margin: 0;
+  font-family: 'Inter', sans-serif;
+  color: #fff;
+  background: linear-gradient(135deg, #0a0015, #1a0033, #2d1b69, #4a148c);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+/* Canvas for particle effect */
+.background {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+
+#particleCanvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+/* Glassmorphism Card */
+.login-card {
+  position: relative;
+  width: 360px;
+  max-width: 90vw;
+  padding: 2.5rem 2rem;
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 16px;
+  backdrop-filter: blur(12px);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+  text-align: center;
+  z-index: 1;
+  animation: fadeIn 0.8s ease-out;
+}
+@keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+/* HCMUTE Logo with Effects */
+.logo-container {
+  text-align: center;
+  margin-bottom: 1.5rem;
+  position: relative;
+}
+
+.logo-wrapper {
+  width: 130px;
+  height: 130px;
+  margin: 0 auto 1rem;
+  position: relative;
+  animation: logoFloat 3s ease-in-out infinite;
+}
+
+@keyframes logoFloat {
+  0%, 100% { transform: translateY(0px) rotate(0deg); }
+  50% { transform: translateY(-10px) rotate(2deg); }
+}
+
+/* Glowing background effect */
+.logo-glow {
+  position: absolute;
+  width: 140%;
+  height: 140%;
+  top: -20%;
+  left: -20%;
+  background: radial-gradient(circle, rgba(139, 92, 246, 0.4), rgba(236, 72, 153, 0.2), transparent 70%);
+  border-radius: 50%;
+  animation: pulse 2s ease-in-out infinite;
+  filter: blur(20px);
+}
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1); opacity: 0.6; }
+  50% { transform: scale(1.1); opacity: 0.8; }
+}
+
+/* Main logo image */
+.logo-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  position: relative;
+  z-index: 2;
+  border-radius: 50%;
+  filter: drop-shadow(0 8px 25px rgba(59, 75, 168, 0.5));
+  transition: all 0.3s ease;
+  background: white;
+  padding: 5px;
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.1);
+}
+
+.logo-wrapper:hover .logo-img {
+  transform: scale(1.05);
+  filter: drop-shadow(0 12px 35px rgba(139, 92, 246, 0.6));
+  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.3);
+}
+
+/* Rotating ring effect */
+.logo-ring {
+  position: absolute;
+  width: 120%;
+  height: 120%;
+  top: -10%;
+  left: -10%;
+  border: 3px solid transparent;
+  border-top-color: rgba(139, 92, 246, 0.6);
+  border-right-color: rgba(236, 72, 153, 0.4);
+  border-radius: 50%;
+  animation: rotate 4s linear infinite;
+  z-index: 1;
+}
+
+@keyframes rotate {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.logo-ring::before {
+  content: '';
+  position: absolute;
+  width: 110%;
+  height: 110%;
+  top: -5%;
+  left: -5%;
+  border: 2px solid transparent;
+  border-bottom-color: rgba(139, 92, 246, 0.3);
+  border-left-color: rgba(236, 72, 153, 0.3);
+  border-radius: 50%;
+  animation: rotate 6s linear infinite reverse;
+}
+
+/* Floating particles around logo */
+.logo-particles {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  z-index: 0;
+}
+
+.logo-particles span {
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  background: linear-gradient(135deg, #8b5cf6, #ec4899);
+  border-radius: 50%;
+  opacity: 0;
+  animation: particleFloat 3s ease-in-out infinite;
+  box-shadow: 0 0 10px rgba(139, 92, 246, 0.8);
+}
+
+.logo-particles span:nth-child(1) {
+  top: 10%;
+  left: 50%;
+  animation-delay: 0s;
+}
+
+.logo-particles span:nth-child(2) {
+  top: 30%;
+  left: 80%;
+  animation-delay: 0.5s;
+}
+
+.logo-particles span:nth-child(3) {
+  top: 60%;
+  left: 90%;
+  animation-delay: 1s;
+}
+
+.logo-particles span:nth-child(4) {
+  top: 80%;
+  left: 50%;
+  animation-delay: 1.5s;
+}
+
+.logo-particles span:nth-child(5) {
+  top: 60%;
+  left: 10%;
+  animation-delay: 2s;
+}
+
+.logo-particles span:nth-child(6) {
+  top: 30%;
+  left: 20%;
+  animation-delay: 2.5s;
+}
+
+@keyframes particleFloat {
+  0% {
+    opacity: 0;
+    transform: translateY(0) scale(0);
+  }
+  50% {
+    opacity: 1;
+    transform: translateY(-20px) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-40px) scale(0);
+  }
+}
+
+/* Logo text with gradient */
+.logo-text {
+  font-size: 1.6rem;
+  font-weight: 800;
+  background: linear-gradient(135deg, #3b4ba8, #8b5cf6, #ec4899);
+  background-size: 200% 200%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  letter-spacing: 5px;
+  text-shadow: 0 4px 10px rgba(59, 75, 168, 0.3);
+  font-family: 'Inter', sans-serif;
+  animation: gradientShift 3s ease infinite;
+  position: relative;
+}
+
+@keyframes gradientShift {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+.logo-text::after {
+  content: 'HCMUTE';
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, #3b4ba8, #8b5cf6);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  filter: blur(8px);
+  opacity: 0.5;
+  z-index: -1;
+}
+
+.logo {
+  width: 80px;
+  margin-bottom: 1rem;
+  animation: float 3s ease-in-out infinite;
+}
+@keyframes float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+
+h1 {
+  margin: 0.5rem 0 0.5rem;
+  font-weight: 600;
+  font-size: 1.8rem;
+  color: #f0f0f0;
+}
+
+.subtitle {
+  margin: 0 0 1.5rem;
+  font-size: 0.9rem;
+  color: #d0d0d0;
+  opacity: 0.8;
+}
+
+/* Form Styles */
+.input-group {
+  margin-bottom: 1.2rem;
+  text-align: left;
+}
+.input-group label {
+  display: block;
+  font-size: 0.9rem;
+  margin-bottom: 0.4rem;
+  color: #e0e0e0;
+}
+.input-group input {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: none;
+  border-radius: 8px;
+  background: rgba(255,255,255,0.2);
+  color: #fff;
+  font-size: 1rem;
+  transition: background 0.3s ease;
+}
+.input-group input::placeholder {
+  color: #d0d0d0;
+}
+.input-group input:focus {
+  outline: none;
+  background: rgba(255,255,255,0.3);
+}
+
+.btn-primary {
+  width: 100%;
+  padding: 0.75rem;
+  border: none;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #ff7e5f, #feb47b);
+  color: #fff;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(255,126,95,0.4);
+}
+
+/* Responsive adjustments */
+@media (max-width: 480px) {
+  .login-card { padding: 2rem 1.5rem; }
+  h1 { font-size: 1.5rem; }
+}
